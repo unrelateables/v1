@@ -1,28 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
-
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-function validateSupabaseUrl(v?: string) {
-  if (!v) return { ok: false, msg: "NOT SET" };
-  let ok = true;
-  const problems: string[] = [];
-  if (!v.startsWith("https://")) {
-    problems.push("must start with https://");
-    ok = false;
-  }
-  if (!v.endsWith(".supabase.co")) {
-    problems.push("must end with .supabase.co (NOT the dashboard URL)");
-    ok = false;
-  }
-  if (v.includes("dashboard") || v.includes("/project/")) {
-    problems.push("looks like the dashboard URL, not the API URL");
-    ok = false;
-  }
-  if (v.endsWith("/")) {
-    problems.push("has a trailing slash — remove it");
-    ok = false;
-  }
-  return { ok, msg: ok ? "format looks correct" : problems.join("; ") };
+function len(v?: string) {
+  return v ? `${v.length} chars` : "0 (NOT SET)";
+}
+function ends(v?: string) {
+  if (!v || v.length < 12) return "—";
+  return `${v.slice(0, 4)}…${v.slice(-4)}`;
 }
 
 export default async function DebugPage() {
@@ -30,106 +14,176 @@ export default async function DebugPage() {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const svc = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const urlCheck = validateSupabaseUrl(url);
-  const urlFormat = /^https:\/\/[a-z0-9]+\.supabase\.co$/i.test(url || "");
+  const urlTrailingSlash = url?.endsWith("/");
+  const urlLooksRight = /^https:\/\/[a-z0-9]+\.supabase\.co$/i.test(url || "");
 
-  // Direct HTTP probe to the auth endpoint (bypasses the SDK)
-  let probe: { status: string; body: string; ok: boolean } = {
-    status: "(not run)",
-    body: "",
+  // ---- RAW FETCH PROBES (capture the true underlying error) ----
+  async function probe(label: string, endpoint: string) {
+    const result: { label: string; ok: boolean; status: string; body: string; err: string } = {
+      label,
+      ok: false,
+      status: "",
+      body: "",
+      err: "",
+    };
+    const target = `${url}${endpoint}`;
+    try {
+      const res = await fetch(target, {
+        method: "GET",
+        cache: "no-store",
+        headers: { apikey: anon || "" },
+      });
+      result.ok = res.ok;
+      result.status = `${res.status} ${res.statusText}`;
+      result.body = (await res.text()).slice(0, 400);
+    } catch (e: any) {
+      result.status = "THREW";
+      result.err =
+        `${e?.name || "Error"}: ${e?.message || "(no message)"}\n` +
+        `cause: ${e?.cause?.message || e?.cause || "(none)"}\n` +
+        `code: ${e?.cause?.code || "(none)"}\n` +
+        `hostname: ${e?.hostname || "(none)"}`;
+    }
+    return result;
+  }
+
+  const probes = await Promise.all([
+    probe("Auth health", "/auth/v1/health"),
+    probe("REST root", "/rest/v1/"),
+  ]);
+
+  // ---- SIGNUP PROBE with full error serialization ----
+  let signup: { ok: boolean; name: string; message: string; status: any; cause: string } = {
     ok: false,
+    name: "",
+    message: "",
+    status: "",
+    cause: "",
   };
   try {
-    const res = await fetch(`${url}/auth/v1/health`, {
-      method: "GET",
-      cache: "no-store",
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: `probe-${Date.now()}@debug.test`,
+      password: "TestPassword123!",
     });
-    probe = {
-      status: `${res.status} ${res.statusText}`,
-      body: (await res.text()).slice(0, 500),
-      ok: res.ok,
-    };
+    if (error) {
+      signup = {
+        ok: false,
+        name: error.name,
+        message: error.message,
+        status: (error as any).status,
+        cause: (error as any)?.cause?.message || JSON.stringify((error as any)?.cause || ""),
+      };
+    } else {
+      signup = {
+        ok: true,
+        name: "none",
+        message: `user ${data.user?.id ? "created" : "null"}`,
+        status: "",
+        cause: "",
+      };
+      // cleanup
+      if (data.user && svc) {
+        const { createClient: mk } = await import("@supabase/supabase-js");
+        mk(url!, svc!, { auth: { persistSession: false } })
+          .auth.admin.deleteUser(data.user.id)
+          .catch(() => {});
+      }
+    }
   } catch (e: any) {
-    probe = {
-      status: "FETCH FAILED",
-      body: `${e?.name || "Error"}: ${e?.message || String(e)}\n${e?.cause?.message || ""}`,
+    signup = {
       ok: false,
+      name: e?.name || "Error",
+      message: e?.message || String(e),
+      status: "",
+      cause: e?.cause?.message || "",
     };
   }
 
   return (
-    <main className="min-h-screen px-6 py-12">
-      <div className="mx-auto max-w-2xl space-y-6">
+    <main className="min-h-screen px-6 py-12 text-neutral-100">
+      <div className="mx-auto max-w-2xl space-y-5">
         <div>
           <h1 className="text-2xl font-bold">Diagnostics</h1>
-          <p className="mt-1 text-sm text-neutral-400">
-            Focused on the Supabase URL + network reachability.
-          </p>
+          <p className="mt-1 text-sm text-neutral-400">Raw network + auth probe.</p>
         </div>
 
-        {/* URL display */}
-        <div className="glass rounded-xl p-4">
-          <p className="text-xs uppercase tracking-wide text-neutral-500">
-            NEXT_PUBLIC_SUPABASE_URL (current value)
-          </p>
-          <p className="mt-1 break-all rounded-lg bg-black/40 p-3 font-mono text-sm text-neutral-100">
+        {/* URL */}
+        <Section title="NEXT_PUBLIC_SUPABASE_URL">
+          <code className="block break-all rounded bg-black/40 p-3 font-mono text-sm">
             {url || "(empty)"}
-          </p>
-          <div className="mt-3 flex items-center gap-2 text-sm">
-            <span className={urlFormat ? "text-emerald-400" : "text-red-400"}>
-              {urlFormat ? "✓ correct format" : "✗ WRONG format"}
+          </code>
+          <p className="mt-2 text-sm">
+            trailing slash:{" "}
+            <span className={urlTrailingSlash ? "text-red-400" : "text-emerald-400"}>
+              {urlTrailingSlash ? "YES (BAD — remove it)" : "no (good)"}
+            </span>{" "}
+            · format:{" "}
+            <span className={urlLooksRight ? "text-emerald-400" : "text-red-400"}>
+              {urlLooksRight ? "correct" : "WRONG"}
             </span>
-          </div>
-          <p className="mt-1 text-sm text-neutral-300">{urlCheck.msg}</p>
-        </div>
-
-        {/* Expected format */}
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
-          <p className="font-medium">It MUST look exactly like this:</p>
-          <p className="mt-1 break-all rounded bg-black/40 p-2 font-mono text-amber-100">
-            https://YOURPROJECTREF.supabase.co
           </p>
-          <p className="mt-2 text-amber-300/80">
-            NOT https://supabase.com/dashboard/project/xxx
-            <br />
-            NOT with a trailing /
-          </p>
-        </div>
-
-        {/* HTTP probe */}
-        <div
-          className={`rounded-2xl border p-5 ${
-            probe.ok ? "border-emerald-500/30 bg-emerald-500/10" : "border-red-500/30 bg-red-500/10"
-          }`}
-        >
-          <h2 className="text-sm font-medium">Direct network probe to {`/auth/v1/health`}</h2>
-          <p className="mt-1 text-sm text-neutral-300">HTTP status: {probe.status}</p>
-          <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-black/50 p-3 text-xs text-neutral-300">
-            {probe.body || "(empty body)"}
-          </pre>
-        </div>
+        </Section>
 
         {/* Keys */}
-        <div className="glass rounded-xl p-4 space-y-2 text-sm">
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Keys</p>
-          <p className="text-neutral-300">
-            anon key: {anon ? "set" : "NOT SET"} · service role: {svc ? "set" : "NOT SET"}
+        <Section title="Keys">
+          <p className="text-sm">anon: {len(anon)} ({ends(anon)})</p>
+          <p className="text-sm">service_role: {len(svc)} ({ends(svc)})</p>
+          <p className="mt-1 text-xs text-neutral-500">
+            A Supabase anon key is ~200 chars & starts with &quot;eyJ&quot;. If the length
+            looks short, it&apos;s probably truncated/partial.
           </p>
-        </div>
+        </Section>
 
-        <div className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-neutral-300">
-          <p className="font-medium text-neutral-100">If the URL is wrong:</p>
-          <p className="mt-1 text-neutral-400">
-            Vercel → Settings → Environment Variables → edit{" "}
-            <code className="rounded bg-white/10 px-1">NEXT_PUBLIC_SUPABASE_URL</code> → paste the
-            correct value → Redeploy.
+        {/* Raw fetch probes */}
+        {probes.map((p) => (
+          <Section key={p.label} title={`Raw fetch: ${p.label}`}>
+            <p className="text-sm">
+              status:{" "}
+              <span className={p.ok ? "text-emerald-400" : "text-red-400"}>{p.status}</span>
+            </p>
+            {p.body && (
+              <pre className="mt-2 overflow-auto rounded bg-black/40 p-2 text-xs text-neutral-300">
+                {p.body}
+              </pre>
+            )}
+            {p.err && (
+              <pre className="mt-2 overflow-auto rounded bg-red-500/10 p-2 text-xs text-red-300">
+                {p.err}
+              </pre>
+            )}
+          </Section>
+        ))}
+
+        {/* Signup */}
+        <Section title="Signup probe">
+          <p className="text-sm">
+            result:{" "}
+            <span className={signup.ok ? "text-emerald-400" : "text-red-400"}>
+              {signup.ok ? "OK" : "FAIL"}
+            </span>
           </p>
-          <p className="mt-3 font-medium text-neutral-100">Correct value location:</p>
-          <p className="mt-1 text-neutral-400">
-            Supabase → ⚙ Project Settings → API → <b>Project URL</b>
-          </p>
-        </div>
+          <pre className="mt-2 overflow-auto rounded bg-black/40 p-2 text-xs text-neutral-300">
+            {`name:    ${signup.name}\nmessage: ${signup.message || "(empty)"}\nstatus:  ${signup.status}\ncause:   ${signup.cause}`}
+          </pre>
+        </Section>
+
+        <p className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-neutral-300">
+          Paste back <b>everything</b> on this page — especially the two &quot;Raw fetch&quot;
+          statuses and any red error text. That tells us whether it&apos;s a network/DNS issue
+          or an auth-config issue.
+        </p>
       </div>
     </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="glass rounded-xl p-4">
+      <p className="mb-2 text-xs uppercase tracking-wide text-neutral-500">{title}</p>
+      {children}
+    </div>
   );
 }

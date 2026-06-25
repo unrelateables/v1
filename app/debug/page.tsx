@@ -2,81 +2,58 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-function mask(v?: string) {
-  if (!v) return "NOT SET";
-  if (v.length < 12) return `set (short: ${v.slice(0, 4)}…)`;
-  return `set (${v.slice(0, 6)}…${v.slice(-4)})`;
+function validateSupabaseUrl(v?: string) {
+  if (!v) return { ok: false, msg: "NOT SET" };
+  let ok = true;
+  const problems: string[] = [];
+  if (!v.startsWith("https://")) {
+    problems.push("must start with https://");
+    ok = false;
+  }
+  if (!v.endsWith(".supabase.co")) {
+    problems.push("must end with .supabase.co (NOT the dashboard URL)");
+    ok = false;
+  }
+  if (v.includes("dashboard") || v.includes("/project/")) {
+    problems.push("looks like the dashboard URL, not the API URL");
+    ok = false;
+  }
+  if (v.endsWith("/")) {
+    problems.push("has a trailing slash — remove it");
+    ok = false;
+  }
+  return { ok, msg: ok ? "format looks correct" : problems.join("; ") };
 }
 
 export default async function DebugPage() {
-  const checks: { label: string; value: string; ok: boolean }[] = [];
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const svc = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  checks.push({ label: "NEXT_PUBLIC_SUPABASE_URL", value: mask(url), ok: !!url });
-  checks.push({ label: "NEXT_PUBLIC_SUPABASE_ANON_KEY", value: mask(anon), ok: !!anon });
-  checks.push({ label: "SUPABASE_SERVICE_ROLE_KEY", value: mask(svc), ok: !!svc });
 
-  // DB connection + profiles table
-  let dbOk = false;
-  let dbMsg = "";
+  const urlCheck = validateSupabaseUrl(url);
+  const urlFormat = /^https:\/\/[a-z0-9]+\.supabase\.co$/i.test(url || "");
+
+  // Direct HTTP probe to the auth endpoint (bypasses the SDK)
+  let probe: { status: string; body: string; ok: boolean } = {
+    status: "(not run)",
+    body: "",
+    ok: false,
+  };
   try {
-    const supabase = createClient();
-    const { count, error } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true });
-    if (error) dbMsg = `profiles table error: ${error.message}`;
-    else {
-      dbOk = true;
-      dbMsg = `profiles table OK — ${count ?? 0} rows`;
-    }
-  } catch (e: any) {
-    dbMsg = `connection failed: ${e?.message || String(e)}`;
-  }
-  checks.push({ label: "Database / profiles table", value: dbMsg, ok: dbOk });
-
-  // ---- LIVE SIGNUP PROBE ----
-  // Attempt a real (throwaway) signup so we can see the RAW Supabase response,
-  // bypassing the form + redirects + browser cache entirely.
-  let probe: {
-    ok: boolean;
-    error: string | null;
-    errorCode: string | null;
-    hasUser: boolean;
-    hasSession: boolean;
-    raw: string;
-  } = { ok: false, error: null, errorCode: null, hasUser: false, hasSession: false, raw: "" };
-
-  try {
-    const supabase = createClient();
-    const testEmail = `probe-${Date.now()}@debug.test`;
-    const { data, error } = await supabase.auth.signUp({
-      email: testEmail,
-      password: "TestPassword123!",
+    const res = await fetch(`${url}/auth/v1/health`, {
+      method: "GET",
+      cache: "no-store",
     });
     probe = {
-      ok: !error,
-      error: error ? error.message || "(no message)" : null,
-      errorCode: error ? String(error.name || error.status || "") : null,
-      hasUser: !!data?.user,
-      hasSession: !!data?.session,
-      raw: JSON.stringify({ error, user: data?.user?.id ?? null }, null, 2),
+      status: `${res.status} ${res.statusText}`,
+      body: (await res.text()).slice(0, 500),
+      ok: res.ok,
     };
-    // clean up: delete the throwaway user if created
-    if (data?.user && svc) {
-      const { createClient: mk } = await import("@supabase/supabase-js");
-      const admin = mk(url!, svc!, { auth: { persistSession: false } });
-      await admin.auth.admin.deleteUser(data.user.id).catch(() => {});
-    }
   } catch (e: any) {
     probe = {
+      status: "FETCH FAILED",
+      body: `${e?.name || "Error"}: ${e?.message || String(e)}\n${e?.cause?.message || ""}`,
       ok: false,
-      error: e?.message || String(e),
-      errorCode: null,
-      hasUser: false,
-      hasSession: false,
-      raw: String(e?.stack || e),
     };
   }
 
@@ -86,71 +63,71 @@ export default async function DebugPage() {
         <div>
           <h1 className="text-2xl font-bold">Diagnostics</h1>
           <p className="mt-1 text-sm text-neutral-400">
-            Environment + database + a live signup probe.
+            Focused on the Supabase URL + network reachability.
           </p>
         </div>
 
-        {/* Config checks */}
-        <div className="space-y-2">
-          {checks.map((c) => (
-            <div key={c.label} className="glass rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-wide text-neutral-500">
-                  {c.label}
-                </span>
-                <span className={c.ok ? "text-emerald-400" : "text-red-400"}>
-                  {c.ok ? "OK" : "FAIL"}
-                </span>
-              </div>
-              <p className="mt-1 break-all text-sm text-neutral-200">{c.value}</p>
-            </div>
-          ))}
+        {/* URL display */}
+        <div className="glass rounded-xl p-4">
+          <p className="text-xs uppercase tracking-wide text-neutral-500">
+            NEXT_PUBLIC_SUPABASE_URL (current value)
+          </p>
+          <p className="mt-1 break-all rounded-lg bg-black/40 p-3 font-mono text-sm text-neutral-100">
+            {url || "(empty)"}
+          </p>
+          <div className="mt-3 flex items-center gap-2 text-sm">
+            <span className={urlFormat ? "text-emerald-400" : "text-red-400"}>
+              {urlFormat ? "✓ correct format" : "✗ WRONG format"}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-neutral-300">{urlCheck.msg}</p>
         </div>
 
-        {/* Signup probe */}
+        {/* Expected format */}
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+          <p className="font-medium">It MUST look exactly like this:</p>
+          <p className="mt-1 break-all rounded bg-black/40 p-2 font-mono text-amber-100">
+            https://YOURPROJECTREF.supabase.co
+          </p>
+          <p className="mt-2 text-amber-300/80">
+            NOT https://supabase.com/dashboard/project/xxx
+            <br />
+            NOT with a trailing /
+          </p>
+        </div>
+
+        {/* HTTP probe */}
         <div
           className={`rounded-2xl border p-5 ${
             probe.ok ? "border-emerald-500/30 bg-emerald-500/10" : "border-red-500/30 bg-red-500/10"
           }`}
         >
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium">Live signup probe</h2>
-            <span className={probe.ok ? "text-emerald-400" : "text-red-400"}>
-              {probe.ok ? "OK" : "FAIL"}
-            </span>
-          </div>
-          <dl className="mt-3 space-y-1 text-sm">
-            <div className="flex gap-2">
-              <dt className="text-neutral-500">error:</dt>
-              <dd className="break-all text-neutral-200">{probe.error ?? "(none)"}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-neutral-500">code/status:</dt>
-              <dd className="text-neutral-200">{probe.errorCode || "—"}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-neutral-500">user created:</dt>
-              <dd className="text-neutral-200">{probe.hasUser ? "yes" : "no"}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-neutral-500">session returned:</dt>
-              <dd className="text-neutral-200">{probe.hasSession ? "yes" : "no"}</dd>
-            </div>
-          </dl>
-          <details className="mt-3">
-            <summary className="cursor-pointer text-xs text-neutral-400">raw response</summary>
-            <pre className="mt-2 overflow-auto rounded-lg bg-black/50 p-3 text-xs text-neutral-300">
-              {probe.raw}
-            </pre>
-          </details>
+          <h2 className="text-sm font-medium">Direct network probe to {`/auth/v1/health`}</h2>
+          <p className="mt-1 text-sm text-neutral-300">HTTP status: {probe.status}</p>
+          <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-black/50 p-3 text-xs text-neutral-300">
+            {probe.body || "(empty body)"}
+          </pre>
+        </div>
+
+        {/* Keys */}
+        <div className="glass rounded-xl p-4 space-y-2 text-sm">
+          <p className="text-xs uppercase tracking-wide text-neutral-500">Keys</p>
+          <p className="text-neutral-300">
+            anon key: {anon ? "set" : "NOT SET"} · service role: {svc ? "set" : "NOT SET"}
+          </p>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-neutral-300">
-          <p className="font-medium text-neutral-100">Tell me the exact text shown above for:</p>
-          <ul className="mt-1 list-inside list-disc text-neutral-400">
-            <li>the red/green <b>Live signup probe</b> box</li>
-            <li>especially the <b>error</b> and <b>code/status</b> lines</li>
-          </ul>
+          <p className="font-medium text-neutral-100">If the URL is wrong:</p>
+          <p className="mt-1 text-neutral-400">
+            Vercel → Settings → Environment Variables → edit{" "}
+            <code className="rounded bg-white/10 px-1">NEXT_PUBLIC_SUPABASE_URL</code> → paste the
+            correct value → Redeploy.
+          </p>
+          <p className="mt-3 font-medium text-neutral-100">Correct value location:</p>
+          <p className="mt-1 text-neutral-400">
+            Supabase → ⚙ Project Settings → API → <b>Project URL</b>
+          </p>
         </div>
       </div>
     </main>

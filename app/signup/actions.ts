@@ -67,8 +67,8 @@ export async function signupAction(formData: FormData) {
     .from("profile_settings")
     .insert({ profile_id: userId });
   if (settingsErr) {
-    await admin.from("profiles").delete().eq("id", userId).catch(() => {});
-    await admin.auth.admin.deleteUser(userId).catch(() => {});
+    try { await admin.from("profiles").delete().eq("id", userId); } catch {}
+    try { await admin.auth.admin.deleteUser(userId); } catch {}
     fail(`Settings setup failed: ${settingsErr.message}`);
   }
 

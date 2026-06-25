@@ -5,6 +5,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { isReservedUsername, USERNAME_REGEX } from "@/lib/constants";
 
+function fail(message: string) {
+  redirect(`/signup?error=${encodeURIComponent(message)}`);
+}
+
 export async function signupAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
@@ -12,22 +16,27 @@ export async function signupAction(formData: FormData) {
   const origin = headers().get("origin") || "";
 
   if (username.length < 3 || username.length > 24 || !USERNAME_REGEX.test(username)) {
-    redirect(`/signup?error=${encodeURIComponent("Username must be 3-24 chars: letters, numbers, underscore.")}`);
+    fail("Username must be 3-24 chars: letters, numbers, underscore.");
   }
   if (isReservedUsername(username)) {
-    redirect(`/signup?error=${encodeURIComponent("That username is reserved.")}`);
+    fail("That username is reserved.");
   }
 
   const supabase = createClient();
 
   // Make sure username is not already taken
-  const { data: existing } = await supabase
+  const { data: existing, error: lookupError } = await supabase
     .from("profiles")
     .select("id")
     .eq("username", username)
     .maybeSingle();
+
+  // If the profiles table itself is missing/broken, surface that clearly.
+  if (lookupError) {
+    fail(`Database not ready: ${lookupError.message}. Did you run the SQL migration?`);
+  }
   if (existing) {
-    redirect(`/signup?error=${encodeURIComponent("That username is already taken.")}`);
+    fail("That username is already taken.");
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -37,15 +46,23 @@ export async function signupAction(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    fail(error.message || "Could not create account.");
   }
 
-  // Set the chosen username on the auto-created profile
+  // Set the chosen username on the auto-created profile row.
   if (data.user) {
-    await supabase
+    const { error: updError } = await supabase
       .from("profiles")
       .update({ username })
       .eq("id", data.user.id);
+
+    if (updError) {
+      // Profile row likely missing → the signup trigger didn't run.
+      fail(
+        `Account created, but profile setup failed: ${updError.message}. ` +
+          "Please run the SQL migration in Supabase, then sign in."
+      );
+    }
   }
 
   if (data.session) {

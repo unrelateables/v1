@@ -96,14 +96,17 @@ returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
+declare
+  derived text;
+  final_username text;
 begin
+  -- derive a base username from the email local part
+  derived := lower(regexp_replace(split_part(new.email, '@', 1), '[^a-zA-Z0-9_]', '', 'g'));
+  -- keep room for "_" + 5-char suffix so total <= 24
+  final_username := left(derived, 18) || '_' || substr(md5(new.id::text), 1, 5);
+
   insert into public.profiles (id, username, display_name)
-  values (
-    new.id,
-    -- derive a unique-ish username from email, caller can change later
-    lower(regexp_replace(split_part(new.email, '@', 1), '[^a-zA-Z0-9_]', '', 'g'))
-      || '_' || substr(md5(new.id::text), 1, 5)
-  )
+  values (new.id, final_username)
   on conflict do nothing;
 
   insert into public.profile_settings (profile_id)

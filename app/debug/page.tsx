@@ -50,6 +50,38 @@ export default async function DebugPage() {
   const probes = await Promise.all([
     probe("Auth health", "/auth/v1/health"),
     probe("REST root", "/rest/v1/"),
+    // RAW signup POST — captures the actual 500 response body
+    (async () => {
+      const result: { label: string; ok: boolean; status: string; body: string; err: string } = {
+        label: "Auth signup POST",
+        ok: false,
+        status: "",
+        body: "",
+        err: "",
+      };
+      try {
+        const res = await fetch(`${url}/auth/v1/signup`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            apikey: anon || "",
+            authorization: `Bearer ${anon || ""}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            email: `rawprobe-${Date.now()}@debug.local`,
+            password: "TestPassword123!",
+          }),
+        });
+        result.ok = res.ok;
+        result.status = `${res.status} ${res.statusText}`;
+        result.body = (await res.text()).slice(0, 800);
+      } catch (e: any) {
+        result.status = "THREW";
+        result.err = `${e?.name || "Error"}: ${e?.message || "(no message)"}`;
+      }
+      return result;
+    })(),
   ]);
 
   // ---- SIGNUP PROBE with full error serialization ----

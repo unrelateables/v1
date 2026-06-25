@@ -19,7 +19,6 @@ export default async function ProfileEditPage() {
       <p className="mt-1 text-sm text-neutral-400">
         How you appear on your public page.
       </p>
-
       <div className="mt-6">
         <ProfileForm profile={profile} />
       </div>

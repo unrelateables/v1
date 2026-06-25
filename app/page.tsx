@@ -32,9 +32,7 @@ export default async function Landing() {
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href="/signup">
-            <Button className="px-6 py-3 text-base">
-              Claim your page
-            </Button>
+            <Button className="px-6 py-3 text-base">Claim your page</Button>
           </Link>
           <Link href="/login">
             <Button variant="outline" className="px-6 py-3 text-base">

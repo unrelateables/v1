@@ -19,7 +19,6 @@ export default async function LinksPage() {
       <p className="mt-1 text-sm text-neutral-400">
         Add the links you want people to visit.
       </p>
-
       <div className="mt-6 space-y-6">
         <LinksManager links={links ?? []} />
       </div>

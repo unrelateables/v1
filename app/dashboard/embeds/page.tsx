@@ -19,7 +19,6 @@ export default async function EmbedsPage() {
       <p className="mt-1 text-sm text-neutral-400">
         Add YouTube, Spotify, or SoundCloud blocks to your page.
       </p>
-
       <div className="mt-6">
         <EmbedsManager embeds={embeds ?? []} />
       </div>

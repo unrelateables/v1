@@ -20,7 +20,6 @@ export default async function AppearancePage() {
       <p className="mt-1 text-sm text-neutral-400">
         Customize the look and feel of your page.
       </p>
-
       <div className="mt-6">
         <AppearanceForm settings={settings as ProfileSettings} />
       </div>

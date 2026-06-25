@@ -15,6 +15,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const {
       data: { user },
     } = await createClient().auth.getUser();

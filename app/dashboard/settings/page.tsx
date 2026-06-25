@@ -8,12 +8,6 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, username, email")
-    .eq("id", user.id)
-    .single();
-
   return (
     <div className="animate-fade-in">
       <h1 className="text-2xl font-bold">Settings</h1>

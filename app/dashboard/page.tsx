@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
+import type { Profile } from "@/lib/types";
 
 export default async function DashboardHome() {
   const supabase = createClient();
@@ -28,27 +29,33 @@ export default async function DashboardHome() {
       supabase.from("links").select("*", { count: "exact", head: true }).eq("profile_id", user.id),
     ]);
 
-  const pageUrl = profile ? `/${profile.username}` : "/";
+  const p = profile as Profile | null;
+  const pageUrl = p ? `/${p.username}` : "/";
+  const stats = {
+    totalViews: totalViews ?? 0,
+    monthViews: monthViews ?? 0,
+    linkCount: linkCount ?? 0,
+  };
 
   return (
     <div className="animate-fade-in">
       <h1 className="text-2xl font-bold">Overview</h1>
       <p className="mt-1 text-sm text-neutral-400">
-        Welcome back{profile?.display_name ? `, ${profile.display_name}` : ""}.
+        Welcome back{p?.display_name ? `, ${p.display_name}` : ""}.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <p className="text-xs uppercase tracking-wide text-neutral-500">Total views</p>
-          <p className="mt-2 text-3xl font-bold">{totalViews ?? 0}</p>
+          <p className="mt-2 text-3xl font-bold">{stats.totalViews}</p>
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-wide text-neutral-500">Views (30d)</p>
-          <p className="mt-2 text-3xl font-bold">{monthViews ?? 0}</p>
+          <p className="mt-2 text-3xl font-bold">{stats.monthViews}</p>
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-wide text-neutral-500">Links</p>
-          <p className="mt-2 text-3xl font-bold">{linkCount ?? 0}</p>
+          <p className="mt-2 text-3xl font-bold">{stats.linkCount}</p>
         </Card>
       </div>
 

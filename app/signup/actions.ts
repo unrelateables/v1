@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { isReservedUsername, USERNAME_REGEX } from "@/lib/constants";
@@ -23,18 +24,14 @@ export async function signupAction(formData: FormData) {
   }
 
   const supabase = createClient();
+  const admin = createAdminClient();
 
   // Make sure username is not already taken
-  const { data: existing, error: lookupError } = await supabase
+  const { data: existing } = await supabase
     .from("profiles")
     .select("id")
     .eq("username", username)
     .maybeSingle();
-
-  // If the profiles table itself is missing/broken, surface that clearly.
-  if (lookupError) {
-    fail(`Database not ready: ${lookupError.message}. Did you run the SQL migration?`);
-  }
   if (existing) {
     fail("That username is already taken.");
   }
@@ -49,20 +46,30 @@ export async function signupAction(formData: FormData) {
     fail(error.message || "Could not create account.");
   }
 
-  // Set the chosen username on the auto-created profile row.
-  if (data.user) {
-    const { error: updError } = await supabase
-      .from("profiles")
-      .update({ username })
-      .eq("id", data.user.id);
+  const userId = data.user?.id;
+  if (!userId) {
+    redirect("/signup?notice=check-email");
+  }
 
-    if (updError) {
-      // Profile row likely missing → the signup trigger didn't run.
-      fail(
-        `Account created, but profile setup failed: ${updError.message}. ` +
-          "Please run the SQL migration in Supabase, then sign in."
-      );
-    }
+  // Create profile + settings using service role (no reliance on a trigger).
+  const { error: profileErr } = await admin
+    .from("profiles")
+    .insert({ id: userId, username })
+    .select()
+    .single();
+  if (profileErr) {
+    // Roll back auth user if profile creation fails
+    await admin.auth.admin.deleteUser(userId).catch(() => {});
+    fail(`Profile setup failed: ${profileErr.message}`);
+  }
+
+  const { error: settingsErr } = await admin
+    .from("profile_settings")
+    .insert({ profile_id: userId });
+  if (settingsErr) {
+    await admin.from("profiles").delete().eq("id", userId).catch(() => {});
+    await admin.auth.admin.deleteUser(userId).catch(() => {});
+    fail(`Settings setup failed: ${settingsErr.message}`);
   }
 
   if (data.session) {

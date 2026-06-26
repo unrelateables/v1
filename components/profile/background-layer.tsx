@@ -6,10 +6,12 @@ export function BackgroundLayer({
   bgType,
   bgValue,
   accent,
+  overlay,
 }: {
   bgType: BgType;
   bgValue: string | null;
   accent: string;
+  overlay: number;
 }) {
   let style: React.CSSProperties = {};
 
@@ -21,23 +23,37 @@ export function BackgroundLayer({
     style.backgroundImage = `url(${bgValue})`;
     style.backgroundSize = "cover";
     style.backgroundPosition = "center";
+    style.backgroundAttachment = "fixed";
   }
+
+  const overlayOpacity = overlay / 100;
 
   return (
     <div className="fixed inset-0 -z-10" style={style}>
-      {(bgType === "image" || bgType === "gradient" || bgType === "solid") && (
-        <div className="absolute inset-0 bg-black/30" />
+      {bgType !== "video" && overlayOpacity > 0 && (
+        <div
+          className="absolute inset-0 bg-black"
+          style={{ opacity: overlayOpacity }}
+        />
       )}
       {bgType === "video" && bgValue && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="h-full w-full object-cover"
-          src={bgValue}
-        />
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover"
+            src={bgValue}
+          />
+          {overlayOpacity > 0 && (
+            <div
+              className="absolute inset-0 bg-black"
+              style={{ opacity: overlayOpacity }}
+            />
+          )}
+        </>
       )}
     </div>
   );

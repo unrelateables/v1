@@ -1,6 +1,14 @@
 export type BgType = "solid" | "gradient" | "image" | "video";
-
 export type ParticleEffect = "none" | "stars" | "hearts";
+export type Layout = "centered" | "left" | "card";
+export type TextAlign = "center" | "left";
+export type FontFamily = "sans" | "mono" | "serif" | "display";
+export type Radius = "none" | "sm" | "md" | "lg" | "xl" | "full";
+export type ButtonStyle = "glass" | "filled" | "outline" | "minimal";
+export type ButtonSize = "sm" | "md" | "lg";
+export type NameSize = "sm" | "md" | "lg" | "xl";
+export type AvatarShape = "circle" | "square" | "rounded";
+export type LinkLayout = "list" | "grid";
 
 export interface ProfileEffects {
   particles: ParticleEffect;
@@ -24,6 +32,7 @@ export interface ProfileSettings {
   profile_id: string;
   bg_type: BgType;
   bg_value: string | null;
+  bg_overlay: number;
   accent_color: string;
   text_color: string;
   effects: ProfileEffects;
@@ -32,6 +41,19 @@ export interface ProfileSettings {
   glassmorphism: boolean;
   typing_effect: boolean;
   is_public: boolean;
+  layout: Layout;
+  text_align: TextAlign;
+  font_family: FontFamily;
+  radius: Radius;
+  button_style: ButtonStyle;
+  button_size: ButtonSize;
+  name_size: NameSize;
+  avatar_shape: AvatarShape;
+  link_layout: LinkLayout;
+  show_views: boolean;
+  show_footer: boolean;
+  custom_css: string | null;
+  template: string;
   updated_at: string;
 }
 

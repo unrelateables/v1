@@ -38,6 +38,7 @@ create table if not exists public.profile_settings (
   profile_id     uuid primary key references public.profiles(id) on delete cascade,
   bg_type        bg_type not null default 'solid',
   bg_value       text,                          -- hex / gradient css / url
+  bg_overlay     integer not null default 30 check (bg_overlay between 0 and 100),
   accent_color   text not null default '#6366f1',
   text_color     text not null default '#ffffff',
   effects        jsonb not null default '{"particles":"none","snow":false,"rain":false}'::jsonb,
@@ -46,8 +47,38 @@ create table if not exists public.profile_settings (
   glassmorphism  boolean not null default true,
   typing_effect  boolean not null default false,
   is_public      boolean not null default true,
+  -- design controls
+  layout         text not null default 'centered',  -- centered | left | card
+  text_align     text not null default 'center',    -- center | left
+  font_family    text not null default 'sans',      -- sans | mono | serif | display
+  radius         text not null default 'lg',        -- none | sm | md | lg | xl | full
+  button_style   text not null default 'glass',     -- glass | filled | outline | minimal
+  button_size    text not null default 'md',        -- sm | md | lg
+  name_size      text not null default 'md',        -- sm | md | lg | xl
+  avatar_shape   text not null default 'circle',    -- circle | square | rounded
+  link_layout    text not null default 'list',      -- list | grid
+  show_views     boolean not null default true,
+  show_footer    boolean not null default true,
+  custom_css     text,
+  template       text not null default 'default',
   updated_at     timestamptz not null default now()
 );
+
+-- Backfill design columns for existing deployments (safe to re-run).
+alter table public.profile_settings add column if not exists bg_overlay     integer not null default 30 check (bg_overlay between 0 and 100);
+alter table public.profile_settings add column if not exists layout         text not null default 'centered';
+alter table public.profile_settings add column if not exists text_align     text not null default 'center';
+alter table public.profile_settings add column if not exists font_family    text not null default 'sans';
+alter table public.profile_settings add column if not exists radius         text not null default 'lg';
+alter table public.profile_settings add column if not exists button_style   text not null default 'glass';
+alter table public.profile_settings add column if not exists button_size    text not null default 'md';
+alter table public.profile_settings add column if not exists name_size      text not null default 'md';
+alter table public.profile_settings add column if not exists avatar_shape   text not null default 'circle';
+alter table public.profile_settings add column if not exists link_layout    text not null default 'list';
+alter table public.profile_settings add column if not exists show_views     boolean not null default true;
+alter table public.profile_settings add column if not exists show_footer    boolean not null default true;
+alter table public.profile_settings add column if not exists custom_css     text;
+alter table public.profile_settings add column if not exists template       text not null default 'default';
 
 create table if not exists public.links (
   id         uuid primary key default gen_random_uuid(),

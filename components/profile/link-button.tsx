@@ -1,20 +1,69 @@
 "use client";
 
 import type { Link } from "@/lib/types";
+import type { ButtonStyle, ButtonSize, Radius, LinkLayout } from "@/lib/types";
+import { RADIUS, BUTTON_PADDING } from "@/lib/design";
 
 export function LinkButton({
   link,
   accent,
-  glass,
+  textColor,
+  buttonStyle,
+  buttonSize,
+  radius,
+  layout,
 }: {
   link: Link;
   accent: string;
-  glass: boolean;
+  textColor: string;
+  buttonStyle: ButtonStyle;
+  buttonSize: ButtonSize;
+  radius: Radius;
+  layout: LinkLayout;
 }) {
   function trackClick() {
     try {
       fetch(`/api/clicks?link=${link.id}`, { method: "POST" }).catch(() => {});
     } catch {}
+  }
+
+  const isGrid = layout === "grid";
+  const pad = BUTTON_PADDING[buttonSize];
+  const rad = RADIUS[radius];
+
+  const baseStyle: React.CSSProperties = {
+    borderRadius: rad,
+    padding: pad,
+    color: textColor,
+  };
+
+  let className = "group flex w-full items-center gap-3 text-sm font-medium transition-all hover:-translate-y-0.5 ";
+  let style: React.CSSProperties = { ...baseStyle };
+
+  switch (buttonStyle) {
+    case "filled":
+      style.background = accent;
+      style.color = "#fff";
+      style.boxShadow = `0 8px 24px -12px ${accent}`;
+      break;
+    case "outline":
+      className += "bg-transparent hover:bg-white/[0.04] ";
+      style.border = `1px solid ${accent}66`;
+      break;
+    case "minimal":
+      className += "bg-transparent hover:bg-white/[0.04] ";
+      style.border = "none";
+      style.borderBottom = `1px solid ${accent}22`;
+      rad ? null : null;
+      style.borderRadius = rad;
+      break;
+    case "glass":
+    default:
+      className += "backdrop-blur-md ";
+      style.background = "rgba(255,255,255,0.06)";
+      style.border = "1px solid rgba(255,255,255,0.10)";
+      style.boxShadow = `0 8px 24px -12px ${accent}`;
+      break;
   }
 
   return (
@@ -23,19 +72,21 @@ export function LinkButton({
       target="_blank"
       rel="noopener noreferrer"
       onClick={trackClick}
-      className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-medium transition-all hover:-translate-y-0.5 ${
-        glass ? "glass" : "bg-black/60 border border-white/10"
-      }`}
-      style={{ boxShadow: `0 8px 24px -12px ${accent}` }}
+      className={className}
+      style={style}
     >
       {link.icon && <span className="text-base">{link.icon}</span>}
-      <span className="flex-1 text-center">{link.title}</span>
-      <span
-        className="opacity-0 transition group-hover:opacity-60"
-        style={{ color: accent }}
-      >
-        ↗
+      <span className={isGrid ? "truncate" : "flex-1 " + (isGrid ? "" : "")}>
+        {link.title}
       </span>
+      {!isGrid && (
+        <span
+          className="opacity-0 transition group-hover:opacity-60"
+          style={{ color: accent }}
+        >
+          ↗
+        </span>
+      )}
     </a>
   );
 }

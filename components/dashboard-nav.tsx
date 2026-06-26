@@ -63,6 +63,13 @@ export function DashboardNav({ profile }: { profile: Profile }) {
 
       <div className="hidden border-t border-white/5 px-3 py-4 lg:block">
         <Link
+          href="/leaderboard"
+          className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200"
+        >
+          <span className="opacity-60">🏆</span>
+          Leaderboard
+        </Link>
+        <Link
           href={`/${profile.username}`}
           target="_blank"
           className="mb-1 flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200"

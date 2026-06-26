@@ -259,6 +259,38 @@ create policy "avatars_owner_delete" on storage.objects
   );
 
 -- ============================================================================
+-- Leaderboard: profiles ranked by view count (public profiles only).
+-- Safe to re-run.
+-- ============================================================================
+create or replace function public.get_leaderboard(limit_count int default 100)
+returns table (
+  id uuid,
+  username text,
+  display_name text,
+  avatar_url text,
+  role user_role,
+  view_count bigint,
+  created_at timestamptz
+)
+language sql
+security definer set search_path = public
+as $$
+  select p.id, p.username, p.display_name, p.avatar_url, p.role,
+         count(v.id) as view_count,
+         p.created_at
+  from public.profiles p
+  left join public.views v on v.profile_id = p.id
+  where p.banned = false
+    and exists (
+      select 1 from public.profile_settings s
+      where s.profile_id = p.id and s.is_public = true
+    )
+  group by p.id
+  order by view_count desc, p.created_at asc
+  limit greatest(1, limit_count);
+$$;
+
+-- ============================================================================
 -- Make yourself an admin (run once, replace the email):
 -- update public.profiles set role = 'admin' where id = (
 --   select id from auth.users where email = 'you@example.com'

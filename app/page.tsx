@@ -46,15 +46,15 @@ export default async function Landing() {
         <div className="grid items-start gap-10 sm:grid-cols-[1fr_auto]">
           <div>
             <p className="font-mono text-xs text-neutral-600">{"// v1 · free, no tiers"}</p>
-            <h1 className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
+            <h1 className="font-display mt-4 text-[2.75rem] leading-[1.04] tracking-tight sm:text-6xl">
               A page for your links.
               <br />
-              <span className="text-neutral-500">That&apos;s the whole thing.</span>
+              <span className="italic text-neutral-500">That&apos;s the whole thing.</span>
             </h1>
 
             <p className="mt-5 max-w-md text-[15px] leading-relaxed text-neutral-400">
               Pick a background, add your links, maybe some music. It&apos;s your
-              page. No watered-down free plan, nothing to unlock later.
+              page — no watered-down free plan, nothing to unlock later.
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">

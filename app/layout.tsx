@@ -1,5 +1,19 @@
 import type { Metadata } from "next";
+import { Hanken_Grotesk, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+
+const body = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const display = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "biolink — one page, all your links",
@@ -14,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${body.variable} ${display.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -50,7 +50,7 @@ export function ProfileView({
 
   return (
     <main
-      className="relative flex min-h-screen flex-col overflow-hidden px-5 py-12"
+      className="relative flex min-h-screen flex-col items-center overflow-hidden px-5 py-12"
       style={{ color: settings.text_color, fontFamily: fontStack }}
     >
       <BackgroundLayer

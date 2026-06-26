@@ -5,7 +5,7 @@ import { useState } from "react";
 import { updateAppearanceAction } from "./actions";
 import { Button, Input, Label } from "@/components/ui";
 import { clsx } from "@/lib/utils";
-import { TEMPLATES } from "@/lib/templates";
+import { TemplatePicker } from "./template-picker";
 import type { BgType, ProfileSettings } from "@/lib/types";
 
 const BG_TYPES: { value: BgType; label: string }[] = [
@@ -34,37 +34,7 @@ export function AppearanceForm({ settings }: { settings: ProfileSettings }) {
       {state?.success && <Msg tone="ok">Saved.</Msg>}
 
       <Section title="Templates">
-        <input type="hidden" name="template" value={settings.template} />
-        <p className="mb-3 text-xs text-neutral-500">
-          One-click styles. Applies a full curated look.
-        </p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              type="submit"
-              name="template"
-              value={t.id}
-              className={clsx(
-                "overflow-hidden rounded-xl border text-left transition hover:-translate-y-0.5",
-                settings.template === t.id
-                  ? "border-white/40"
-                  : "border-white/10"
-              )}
-            >
-              <div className="h-14 w-full" style={{ background: t.swatch }} />
-              <div className="px-2.5 py-2">
-                <p className="text-xs font-medium text-white">
-                  {t.emoji} {t.name}
-                </p>
-                <p className="text-[10px] text-neutral-500">{t.description}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-[11px] text-neutral-600">
-          Picking a template saves instantly. Then fine-tune below.
-        </p>
+        <TemplatePicker active={settings.template} />
       </Section>
 
       <Section title="Background">

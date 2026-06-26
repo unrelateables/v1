@@ -44,8 +44,7 @@ export async function updateAppearanceAction(
   const custom_css = g("custom_css").trim();
 
   // If a template was chosen, pull its overlay values for the fields not on the form.
-  const templateId = g("template") || "default";
-  const tmpl = getTemplate(templateId);
+  const templateId = g("template");
 
   if ((bg_type === "image" || bg_type === "video") && !isValidUrl(bg_value)) {
     return { error: "Background image/video must be a valid URL." };
@@ -87,17 +86,11 @@ export async function updateAppearanceAction(
     show_views: on("show_views"),
     show_footer: on("show_footer"),
     custom_css: custom_css || null,
-    template: templateId,
   };
 
-  // Merge any template-only fields (e.g. when switching template, fields not
-  // present on the form still get set). Here all fields are on the form, so
-  // this is mostly a safety net.
-  if (tmpl?.apply) {
-    for (const [k, v] of Object.entries(tmpl.apply)) {
-      if (!(k in payload)) payload[k] = v;
-    }
-  }
+  // Preserve the current template only if the form passed it explicitly
+  // (it normally doesn't — templates apply via their own action).
+  if (templateId) payload.template = templateId;
 
   const { error } = await supabase
     .from("profile_settings")

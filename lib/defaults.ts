@@ -1,0 +1,47 @@
+import type { ProfileSettings } from "@/lib/types";
+
+/** Safe defaults for every column. Merged with DB data so pages never crash. */
+export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
+  bg_type: "solid",
+  bg_value: null,
+  bg_overlay: 30,
+  accent_color: "#6366f1",
+  text_color: "#ffffff",
+  effects: { particles: "none", snow: false, rain: false },
+  audio_url: null,
+  audio_autoplay: false,
+  glassmorphism: true,
+  typing_effect: false,
+  is_public: true,
+  layout: "centered",
+  text_align: "center",
+  font_family: "sans",
+  radius: "full",
+  button_style: "glass",
+  button_size: "md",
+  name_size: "md",
+  avatar_shape: "circle",
+  link_layout: "list",
+  show_views: true,
+  show_footer: true,
+  custom_css: null,
+  template: "default",
+};
+
+/** Merge raw DB row with safe defaults. Never returns undefined fields. */
+export function safeSettings(raw: any): ProfileSettings {
+  return {
+    profile_id: raw?.profile_id ?? "",
+    ...SETTINGS_DEFAULTS,
+    ...raw,
+    effects: {
+      ...(SETTINGS_DEFAULTS.effects as object),
+      ...(raw?.effects ?? {}),
+    },
+  } as ProfileSettings;
+}
+
+/** Safe defaults for a profile row (in case `badges` column is missing). */
+export function safeProfile(raw: any): any {
+  return { ...raw, badges: raw?.badges ?? [], role: raw?.role ?? "user" };
+}

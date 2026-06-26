@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AppearanceForm } from "./appearance-form";
-import type { ProfileSettings } from "@/lib/types";
+import { safeSettings } from "@/lib/defaults";
 
 export default async function AppearancePage() {
   const supabase = createClient();
@@ -8,11 +8,13 @@ export default async function AppearancePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: settings } = await supabase
+  const { data: rawSettings } = await supabase
     .from("profile_settings")
     .select("*")
     .eq("profile_id", user!.id)
     .single();
+
+  const settings = safeSettings(rawSettings);
 
   return (
     <div className="animate-fade-in">
@@ -22,7 +24,7 @@ export default async function AppearancePage() {
         Customize the look and feel of your page.
       </p>
       <div className="mt-6">
-        <AppearanceForm settings={settings as ProfileSettings} />
+        <AppearanceForm settings={settings} />
       </div>
     </div>
   );

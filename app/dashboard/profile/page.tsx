@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "./profile-form";
+import { safeProfile } from "@/lib/defaults";
 
 export default async function ProfileEditPage() {
   const supabase = createClient();
@@ -7,11 +8,13 @@ export default async function ProfileEditPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
+  const { data: rawProfile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
     .single();
+
+  const profile = safeProfile(rawProfile);
 
   return (
     <div className="animate-fade-in">

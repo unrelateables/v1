@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import type { Profile } from "@/lib/types";
+import { safeProfile } from "@/lib/defaults";
 
 export default async function DashboardHome() {
   const supabase = createClient();
@@ -10,7 +11,7 @@ export default async function DashboardHome() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: rawProfile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
@@ -29,7 +30,7 @@ export default async function DashboardHome() {
       supabase.from("links").select("*", { count: "exact", head: true }).eq("profile_id", user.id),
     ]);
 
-  const p = profile as Profile | null;
+  const p = safeProfile(rawProfile) as Profile | null;
   const pageUrl = p ? `/${p.username}` : "/";
   const stats = {
     totalViews: totalViews ?? 0,

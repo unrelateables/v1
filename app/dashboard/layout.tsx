@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard-nav";
 import type { Profile } from "@/lib/types";
+import { safeProfile } from "@/lib/defaults";
 
 export default async function DashboardLayout({
   children,
@@ -15,13 +16,15 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const { data: rawProfile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (!profile) redirect("/login");
+  if (!rawProfile) redirect("/login");
+
+  const profile = safeProfile(rawProfile) as Profile;
 
   return (
     <div className="relative min-h-screen lg:flex">

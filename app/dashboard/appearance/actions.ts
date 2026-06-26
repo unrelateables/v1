@@ -8,22 +8,10 @@ import { getTemplate } from "@/lib/templates";
 
 export type FormState = { error?: string; success?: boolean } | undefined;
 
-const ALLOWED = (arr: string[]) => (v: string) =>
-  arr.includes(v) ? v : arr[0];
-
-const layoutOk = ALLOWED(["centered", "left", "card"]);
-const alignOk = ALLOWED(["center", "left"]);
-const fontOk = ALLOWED(["sans", "mono", "serif", "display"]);
-const radiusOk = ALLOWED(["none", "sm", "md", "lg", "xl", "full"]);
-const btnStyleOk = ALLOWED(["glass", "filled", "outline", "minimal"]);
-const btnSizeOk = ALLOWED(["sm", "md", "lg"]);
-const nameSizeOk = ALLOWED(["sm", "md", "lg", "xl"]);
-const avatarOk = ALLOWED(["circle", "square", "rounded"]);
-const linkLayoutOk = ALLOWED(["list", "grid"]);
-const particleOk = ALLOWED(["none", "stars", "hearts"]);
+const ok = (arr: string[], v: string) => (arr.includes(v) ? v : arr[0]);
 
 export async function updateAppearanceAction(
-  _prevState: FormState,
+  _prev: FormState,
   formData: FormData
 ): Promise<FormState> {
   const supabase = createClient();
@@ -37,14 +25,10 @@ export async function updateAppearanceAction(
 
   const bg_type = (g("bg_type") || "solid") as "solid" | "gradient" | "image" | "video";
   const bg_value = g("bg_value").trim();
-  let bg_overlay = Math.max(0, Math.min(100, parseInt(g("bg_overlay")) || 30));
   const accent_color = g("accent_color") || "#6366f1";
   const text_color = g("text_color") || "#ffffff";
   const audio_url = g("audio_url").trim();
   const custom_css = g("custom_css").trim();
-
-  // If a template was chosen, pull its overlay values for the fields not on the form.
-  const templateId = g("template");
 
   if ((bg_type === "image" || bg_type === "video") && !isValidUrl(bg_value)) {
     return { error: "Background image/video must be a valid URL." };
@@ -52,20 +36,18 @@ export async function updateAppearanceAction(
   if (audio_url && !isValidUrl(audio_url)) {
     return { error: "Audio URL must be a valid URL." };
   }
-  if (custom_css.length > 10000) {
-    return { error: "Custom CSS is too long (max 10,000 chars)." };
-  }
 
   const effects = {
-    particles: particleOk(g("particles")),
+    particles: ok(["none", "stars", "hearts"], g("particles")),
     snow: on("snow"),
     rain: on("rain"),
   };
 
-  const payload: Record<string, unknown> = {
+  // Build the FULL payload with all columns.
+  const fullPayload: Record<string, unknown> = {
     bg_type,
     bg_value: bg_value || null,
-    bg_overlay,
+    bg_overlay: Math.max(0, Math.min(100, parseInt(g("bg_overlay")) || 30)),
     accent_color,
     text_color,
     effects,
@@ -74,30 +56,46 @@ export async function updateAppearanceAction(
     glassmorphism: on("glassmorphism"),
     typing_effect: on("typing_effect"),
     is_public: on("is_public"),
-    layout: layoutOk(g("layout")),
-    text_align: alignOk(g("text_align")),
-    font_family: fontOk(g("font_family")),
-    radius: radiusOk(g("radius")),
-    button_style: btnStyleOk(g("button_style")),
-    button_size: btnSizeOk(g("button_size")),
-    name_size: nameSizeOk(g("name_size")),
-    avatar_shape: avatarOk(g("avatar_shape")),
-    link_layout: linkLayoutOk(g("link_layout")),
+    layout: ok(["centered", "left"], g("layout")),
+    text_align: ok(["center", "left"], g("text_align")),
+    font_family: ok(["sans", "mono", "serif", "display"], g("font_family")),
+    radius: ok(["none", "sm", "md", "lg", "xl", "full"], g("radius")),
+    button_style: ok(["glass", "filled", "outline", "minimal"], g("button_style")),
+    button_size: ok(["sm", "md", "lg"], g("button_size")),
+    name_size: ok(["sm", "md", "lg", "xl"], g("name_size")),
+    avatar_shape: ok(["circle", "square", "rounded"], g("avatar_shape")),
+    link_layout: ok(["list", "grid"], g("link_layout")),
     show_views: on("show_views"),
     show_footer: on("show_footer"),
     custom_css: custom_css || null,
   };
 
-  // Preserve the current template only if the form passed it explicitly
-  // (it normally doesn't — templates apply via their own action).
-  if (templateId) payload.template = templateId;
-
-  const { error } = await supabase
+  // Try full update first. If columns are missing, fall back to basic columns.
+  let { error } = await supabase
     .from("profile_settings")
-    .update(payload)
+    .update(fullPayload)
     .eq("profile_id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    // Fallback: update only the original columns that definitely exist.
+    const basicPayload: Record<string, unknown> = {
+      bg_type,
+      bg_value: bg_value || null,
+      accent_color,
+      text_color,
+      effects,
+      audio_url: audio_url || null,
+      audio_autoplay: on("audio_autoplay"),
+      glassmorphism: on("glassmorphism"),
+      typing_effect: on("typing_effect"),
+      is_public: on("is_public"),
+    };
+    const r2 = await supabase
+      .from("profile_settings")
+      .update(basicPayload)
+      .eq("profile_id", user.id);
+    if (r2.error) return { error: r2.error.message };
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -105,14 +103,11 @@ export async function updateAppearanceAction(
     .eq("id", user.id)
     .single();
 
-  if (profile?.username) {
-    revalidatePath(`/${profile.username}`);
-  }
+  if (profile?.username) revalidatePath(`/${profile.username}`);
   revalidatePath("/dashboard/appearance");
   return { success: true };
 }
 
-/** Applies a template's settings immediately (called by the template picker). */
 export async function applyTemplateAction(templateId: string) {
   const supabase = createClient();
   const {

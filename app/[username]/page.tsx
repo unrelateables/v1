@@ -72,46 +72,50 @@ export async function generateMetadata({
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default async function UsernamePage({
   params,
 }: {
   params: { username: string };
 }) {
-  const supabase = createClient();
+  try {
+    const supabase = createClient();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("username", params.username)
-    .maybeSingle();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("username", params.username)
+      .maybeSingle();
 
-  if (!profile || profile.banned) notFound();
+    if (!profile || profile.banned) notFound();
 
-  const [
-    { data: settings },
-    { data: links },
-    { data: embeds },
-  ] = await Promise.all([
-    supabase.from("profile_settings").select("*").eq("profile_id", profile.id).single(),
-    supabase.from("links").select("*").eq("profile_id", profile.id).order("position"),
-    supabase.from("embeds").select("*").eq("profile_id", profile.id).order("position"),
-  ]);
+    const [
+      { data: rawSettings },
+      { data: links },
+      { data: embeds },
+    ] = await Promise.all([
+      supabase.from("profile_settings").select("*").eq("profile_id", profile.id).single(),
+      supabase.from("links").select("*").eq("profile_id", profile.id).order("position"),
+      supabase.from("embeds").select("*").eq("profile_id", profile.id).order("position"),
+    ]);
 
-  if (!settings?.is_public) notFound();
+    const settings = (rawSettings ? { ...DEFAULTS, ...rawSettings } : DEFAULTS) as ProfileSettings;
 
-  // Merge defaults for any columns missing from the DB.
-  const safeSettings = { ...DEFAULTS, ...settings } as ProfileSettings;
+    if (!settings.is_public) notFound();
 
-  const page: ProfilePage = {
-    profile,
-    settings: safeSettings,
-    links: links ?? [],
-    embeds: embeds ?? [],
-  };
+    const page: ProfilePage = {
+      profile,
+      settings,
+      links: links ?? [],
+      embeds: embeds ?? [],
+    };
 
-  const badges = getProfileBadges(profile);
+    const badges = getProfileBadges(profile);
 
-  return <ProfileView page={page} badges={badges} />;
+    return <ProfileView page={page} badges={badges} />;
+  } catch (e) {
+    notFound();
+  }
 }

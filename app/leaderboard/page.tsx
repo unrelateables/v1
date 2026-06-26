@@ -33,9 +33,11 @@ export default async function LeaderboardPage() {
 
   return (
     <main className="relative min-h-screen px-6 py-12">
+      {/* grid backdrop */}
+      <div className="grid-bg pointer-events-none fixed inset-0 -z-10" aria-hidden />
       {/* backdrop */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-500/15 blur-[120px]" />
+        <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-500/10 blur-[120px]" />
       </div>
 
       <div className="mx-auto max-w-2xl">

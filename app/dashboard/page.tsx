@@ -39,30 +39,47 @@ export default async function DashboardHome() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold">Overview</h1>
-      <p className="mt-1 text-sm text-neutral-400">
-        Welcome back{p?.display_name ? `, ${p.display_name}` : ""}.
+      <p className="font-mono text-xs text-neutral-600">{"// dashboard"}</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">
+        Hey{p?.display_name ? `, ${p.display_name}` : ""}
+      </h1>
+      <p className="mt-1 text-sm text-neutral-500">
+        Here&apos;s how your page is doing.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Total views</p>
-          <p className="mt-2 text-3xl font-bold">{stats.totalViews}</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-neutral-600">
+            total views
+          </p>
+          <p className="mt-2 text-3xl font-semibold tabular-nums">
+            {stats.totalViews}
+          </p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Views (30d)</p>
-          <p className="mt-2 text-3xl font-bold">{stats.monthViews}</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-neutral-600">
+            views (30d)
+          </p>
+          <p className="mt-2 text-3xl font-semibold tabular-nums">
+            {stats.monthViews}
+          </p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Links</p>
-          <p className="mt-2 text-3xl font-bold">{stats.linkCount}</p>
+          <p className="font-mono text-[11px] uppercase tracking-wide text-neutral-600">
+            links
+          </p>
+          <p className="mt-2 text-3xl font-semibold tabular-nums">
+            {stats.linkCount}
+          </p>
         </Card>
       </div>
 
       <Card className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-neutral-400">Your page</p>
-          <p className="font-medium">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-neutral-600">
+            your page
+          </p>
+          <p className="mt-0.5 font-medium text-neutral-200">
             {process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, "")}
             {pageUrl}
           </p>
@@ -70,9 +87,9 @@ export default async function DashboardHome() {
         <Link
           href={pageUrl}
           target="_blank"
-          className="rounded-xl bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+          className="link-underline rounded-lg text-sm text-neutral-300"
         >
-          Open ↗
+          open ↗
         </Link>
       </Card>
     </div>

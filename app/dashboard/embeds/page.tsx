@@ -15,8 +15,9 @@ export default async function EmbedsPage() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold">Embeds</h1>
-      <p className="mt-1 text-sm text-neutral-400">
+      <p className="font-mono text-xs text-neutral-600">{"// embeds"}</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">Embeds</h1>
+      <p className="mt-1 text-sm text-neutral-500">
         Add YouTube, Spotify, or SoundCloud blocks to your page.
       </p>
       <div className="mt-6">

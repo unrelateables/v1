@@ -16,8 +16,9 @@ export default async function AppearancePage() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold">Appearance</h1>
-      <p className="mt-1 text-sm text-neutral-400">
+      <p className="font-mono text-xs text-neutral-600">{"// appearance"}</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">Appearance</h1>
+      <p className="mt-1 text-sm text-neutral-500">
         Customize the look and feel of your page.
       </p>
       <div className="mt-6">

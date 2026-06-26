@@ -24,9 +24,12 @@ export default async function DashboardLayout({
   if (!profile) redirect("/login");
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="relative min-h-screen lg:flex">
+      {/* grid backdrop, same as landing */}
+      <div className="grid-bg pointer-events-none fixed inset-0 -z-10" aria-hidden />
+
       <DashboardNav profile={profile as Profile} />
-      <main className="flex-1 px-5 py-8 lg:px-10">
+      <main className="relative flex-1 px-5 py-8 lg:px-10 lg:py-10">
         <div className="mx-auto max-w-3xl">{children}</div>
       </main>
     </div>

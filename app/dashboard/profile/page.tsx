@@ -15,8 +15,9 @@ export default async function ProfileEditPage() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold">Profile</h1>
-      <p className="mt-1 text-sm text-neutral-400">
+      <p className="font-mono text-xs text-neutral-600">{"// profile"}</p>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight">Profile</h1>
+      <p className="mt-1 text-sm text-neutral-500">
         How you appear on your public page.
       </p>
       <div className="mt-6">

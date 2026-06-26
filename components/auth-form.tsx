@@ -16,43 +16,43 @@ export function AuthForm({
   error?: string;
   notice?: string;
 }) {
-
   const isSignup = mode === "signup";
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-accent/20 blur-[120px]" />
-      </div>
+    <main className="relative flex min-h-screen items-center justify-center px-6">
+      {/* grid backdrop */}
+      <div className="grid-bg pointer-events-none absolute inset-0 -z-10" aria-hidden />
+      {/* top accent line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
       <div className="w-full max-w-sm animate-fade-in">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 font-bold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-lg shadow-lg shadow-accent/30">
-              b
-            </span>
+          <Link href="/" className="font-mono text-sm text-neutral-200">
             biolink
           </Link>
-          <h1 className="mt-6 text-2xl font-bold">
-            {isSignup ? "Create your account" : "Welcome back"}
+          <p className="mt-5 font-mono text-xs text-neutral-600">
+            {isSignup ? "// sign up" : "// log in"}
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">
+            {isSignup ? "Make your page" : "Welcome back"}
           </h1>
         </div>
 
-        <div className="glass rounded-2xl p-6">
+        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
           {error && (
-            <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">
+            <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">
               {error}
             </div>
           )}
           {notice && (
-            <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-300">
+            <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-300">
               {notice}
             </div>
           )}
           <form action={action} className="space-y-4">
             {isSignup && (
               <div>
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">username</Label>
                 <Input
                   id="username"
                   name="username"
@@ -65,7 +65,7 @@ export function AuthForm({
               </div>
             )}
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">email</Label>
               <Input
                 id="email"
                 name="email"
@@ -76,7 +76,7 @@ export function AuthForm({
               />
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">password</Label>
               <Input
                 id="password"
                 name="password"

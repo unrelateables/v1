@@ -7,12 +7,12 @@ import type { Profile } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 
 const NAV = [
-  { href: "/dashboard", label: "Overview", icon: "▦" },
-  { href: "/dashboard/profile", label: "Profile", icon: "◉" },
-  { href: "/dashboard/links", label: "Links", icon: "↗" },
-  { href: "/dashboard/embeds", label: "Embeds", icon: "▤" },
-  { href: "/dashboard/appearance", label: "Appearance", icon: "✦" },
-  { href: "/dashboard/settings", label: "Settings", icon: "⚙" },
+  { href: "/dashboard", label: "overview", icon: "▦" },
+  { href: "/dashboard/profile", label: "profile", icon: "◉" },
+  { href: "/dashboard/links", label: "links", icon: "↗" },
+  { href: "/dashboard/embeds", label: "embeds", icon: "▤" },
+  { href: "/dashboard/appearance", label: "appearance", icon: "✦" },
+  { href: "/dashboard/settings", label: "settings", icon: "⚙" },
 ];
 
 export function DashboardNav({ profile }: { profile: Profile }) {
@@ -27,17 +27,15 @@ export function DashboardNav({ profile }: { profile: Profile }) {
   }
 
   return (
-    <aside className="border-b border-white/5 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
-      <div className="flex items-center gap-2 px-6 py-5">
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm shadow-lg shadow-accent/30">
-            b
-          </span>
+    <aside className="border-b border-white/5 lg:h-screen lg:w-60 lg:border-b-0 lg:border-r lg:bg-black/20 lg:backdrop-blur-sm">
+      {/* logo — mono, matches landing */}
+      <div className="px-6 py-5">
+        <Link href="/" className="font-mono text-sm text-neutral-200">
           biolink
         </Link>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto px-4 pb-4 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-3">
+      <nav className="flex gap-1 overflow-x-auto px-3 pb-4 lg:flex-col lg:gap-0.5 lg:overflow-visible">
         {NAV.map((item) => {
           const active =
             item.href === "/dashboard"
@@ -48,13 +46,13 @@ export function DashboardNav({ profile }: { profile: Profile }) {
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
+                "flex shrink-0 items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
                 active
-                  ? "bg-white/10 text-white"
-                  : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200"
+                  ? "bg-white/[0.07] font-medium text-white"
+                  : "text-neutral-500 hover:bg-white/[0.03] hover:text-neutral-200"
               )}
             >
-              <span className="opacity-60">{item.icon}</span>
+              <span className="font-mono text-xs opacity-50">{item.icon}</span>
               {item.label}
             </Link>
           );
@@ -64,33 +62,34 @@ export function DashboardNav({ profile }: { profile: Profile }) {
       <div className="hidden border-t border-white/5 px-3 py-4 lg:block">
         <Link
           href="/leaderboard"
-          className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200"
+          className="mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
-          <span className="opacity-60">🏆</span>
-          Leaderboard
+          <span className="font-mono text-xs opacity-50">▴</span>
+          leaderboard
         </Link>
         <Link
           href={`/${profile.username}`}
           target="_blank"
-          className="mb-1 flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200"
+          className="mb-0.5 flex items-center justify-between rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
-          <span>View page ↗</span>
+          <span>view page</span>
+          <span className="font-mono text-xs opacity-50">↗</span>
         </Link>
         {profile.role === "admin" && (
           <Link
             href="/admin"
-            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-400 hover:bg-white/5"
+            className="mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-amber-400/90 transition hover:bg-white/[0.03]"
           >
-            <span className="opacity-60">★</span>
-            Admin
+            <span className="font-mono text-xs opacity-50">★</span>
+            admin
           </Link>
         )}
         <button
           onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
-          <span className="opacity-60">⏻</span>
-          Sign out
+          <span className="font-mono text-xs opacity-50">⏻</span>
+          sign out
         </button>
       </div>
     </aside>

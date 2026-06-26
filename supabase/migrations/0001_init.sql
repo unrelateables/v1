@@ -51,7 +51,7 @@ create table if not exists public.profile_settings (
   layout         text not null default 'centered',  -- centered | left | card
   text_align     text not null default 'center',    -- center | left
   font_family    text not null default 'sans',      -- sans | mono | serif | display
-  radius         text not null default 'lg',        -- none | sm | md | lg | xl | full
+  radius         text not null default 'full',        -- none | sm | md | lg | xl | full
   button_style   text not null default 'glass',     -- glass | filled | outline | minimal
   button_size    text not null default 'md',        -- sm | md | lg
   name_size      text not null default 'md',        -- sm | md | lg | xl
@@ -69,7 +69,7 @@ alter table public.profile_settings add column if not exists bg_overlay     inte
 alter table public.profile_settings add column if not exists layout         text not null default 'centered';
 alter table public.profile_settings add column if not exists text_align     text not null default 'center';
 alter table public.profile_settings add column if not exists font_family    text not null default 'sans';
-alter table public.profile_settings add column if not exists radius         text not null default 'lg';
+alter table public.profile_settings add column if not exists radius         text not null default 'full';
 alter table public.profile_settings add column if not exists button_style   text not null default 'glass';
 alter table public.profile_settings add column if not exists button_size    text not null default 'md';
 alter table public.profile_settings add column if not exists name_size      text not null default 'md';

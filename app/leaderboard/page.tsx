@@ -82,7 +82,7 @@ export default async function LeaderboardPage() {
                 <Link
                   key={row.id}
                   href={`/${row.username}`}
-                  className="glass group flex items-center gap-4 rounded-2xl p-4 transition-all hover:-translate-y-0.5 hover:border-white/20"
+                  className="glass group flex items-center gap-4 rounded-full p-4 transition-all hover:-translate-y-0.5 hover:border-white/20"
                 >
                   {/* rank */}
                   <div className="flex w-8 shrink-0 justify-center text-lg font-bold">

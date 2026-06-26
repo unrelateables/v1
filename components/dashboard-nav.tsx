@@ -46,7 +46,7 @@ export function DashboardNav({ profile }: { profile: Profile }) {
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex shrink-0 items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
+                "flex shrink-0 items-center gap-3 rounded-full px-3 py-2 text-sm transition",
                 active
                   ? "bg-white/[0.07] font-medium text-white"
                   : "text-neutral-500 hover:bg-white/[0.03] hover:text-neutral-200"
@@ -62,7 +62,7 @@ export function DashboardNav({ profile }: { profile: Profile }) {
       <div className="hidden border-t border-white/5 px-3 py-4 lg:block">
         <Link
           href="/leaderboard"
-          className="mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
+          className="mb-0.5 flex items-center gap-3 rounded-full px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
           <span className="font-mono text-xs opacity-50">▴</span>
           leaderboard
@@ -70,7 +70,7 @@ export function DashboardNav({ profile }: { profile: Profile }) {
         <Link
           href={`/${profile.username}`}
           target="_blank"
-          className="mb-0.5 flex items-center justify-between rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
+          className="mb-0.5 flex items-center justify-between rounded-full px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
           <span>view page</span>
           <span className="font-mono text-xs opacity-50">↗</span>
@@ -78,7 +78,7 @@ export function DashboardNav({ profile }: { profile: Profile }) {
         {profile.role === "admin" && (
           <Link
             href="/admin"
-            className="mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-amber-400/90 transition hover:bg-white/[0.03]"
+            className="mb-0.5 flex items-center gap-3 rounded-full px-3 py-2 text-sm text-amber-400/90 transition hover:bg-white/[0.03]"
           >
             <span className="font-mono text-xs opacity-50">★</span>
             admin
@@ -86,7 +86,7 @@ export function DashboardNav({ profile }: { profile: Profile }) {
         )}
         <button
           onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
+          className="flex w-full items-center gap-3 rounded-full px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.03] hover:text-neutral-200"
         >
           <span className="font-mono text-xs opacity-50">⏻</span>
           sign out

@@ -17,7 +17,7 @@ export function Button({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:hover:translate-y-0",
+        "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:hover:translate-y-0",
         variants[variant],
         className
       )}
@@ -33,7 +33,7 @@ export function Input({
   return (
     <input
       className={clsx(
-        "w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition focus:border-white/25 focus:bg-white/[0.04]",
+        "w-full rounded-full border border-white/10 bg-white/[0.02] px-5 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition focus:border-white/25 focus:bg-white/[0.04]",
         className
       )}
       {...props}
@@ -48,7 +48,7 @@ export function Textarea({
   return (
     <textarea
       className={clsx(
-        "w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition focus:border-white/25 focus:bg-white/[0.04]",
+        "w-full rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3 text-sm text-white placeholder:text-neutral-600 outline-none transition focus:border-white/25 focus:bg-white/[0.04]",
         className
       )}
       {...props}
@@ -78,7 +78,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5",
+        "rounded-3xl border border-white/[0.07] bg-white/[0.02] p-5",
         className
       )}
       {...props}

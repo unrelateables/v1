@@ -13,142 +13,122 @@ export default async function Landing() {
   if (user) redirect("/dashboard");
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* single, restrained background glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/15 blur-[140px]" />
-      </div>
+    <main className="relative min-h-screen">
+      {/* thin top accent line instead of a glow blob */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
       {/* nav */}
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm text-black">
-            b
-          </span>
+      <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
+        <Link href="/" className="font-mono text-sm text-neutral-200">
           biolink
         </Link>
         <nav className="flex items-center gap-5 text-sm">
           <Link
             href="/leaderboard"
-            className="text-neutral-400 transition hover:text-white"
+            className="text-neutral-500 transition hover:text-neutral-200"
           >
-            Leaderboard
+            leaderboard
           </Link>
           <Link
             href="/login"
-            className="text-neutral-400 transition hover:text-white"
+            className="text-neutral-500 transition hover:text-neutral-200"
           >
-            Log in
+            log in
           </Link>
-          <Link href="/signup">
-            <Button className="px-4 py-2 text-sm">Sign up</Button>
+          <Link href="/signup" className="text-neutral-200 underline-offset-4 hover:underline">
+            sign up
           </Link>
         </nav>
       </header>
 
-      {/* hero — left copy, right preview */}
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-10 lg:grid-cols-2 lg:pt-20">
-        <div className="animate-fade-in">
-          <p className="mb-5 text-sm font-medium text-neutral-400">
-            a tiny corner of the internet, yours to decorate.
-          </p>
-          <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            One page.
-            <br />
-            All your links.
-            <br />
-            <span className="text-neutral-500">No clutter.</span>
-          </h1>
+      {/* hero — asymmetric: text wide, preview nudged right and slightly down */}
+      <section className="mx-auto max-w-3xl px-6 pt-16">
+        <div className="grid items-start gap-10 sm:grid-cols-[1fr_auto]">
+          <div>
+            <p className="font-mono text-xs text-neutral-600">{"// v1 · free, no tiers"}</p>
+            <h1 className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
+              A page for your links.
+              <br />
+              <span className="text-neutral-500">That&apos;s the whole thing.</span>
+            </h1>
 
-          <p className="mt-6 max-w-md text-base leading-relaxed text-neutral-400">
-            Drop a background, pick some effects, add your music, and you&apos;ve
-            got a page that looks like you built it — because you did. Free,
-            forever, no premium tiers lurking.
-          </p>
+            <p className="mt-5 max-w-md text-[15px] leading-relaxed text-neutral-400">
+              Pick a background, add your links, maybe some music. It&apos;s your
+              page. No watered-down free plan, nothing to unlock later.
+            </p>
 
-          <div className="mt-8 flex items-center gap-3">
-            <Link href="/signup">
-              <Button className="px-6 py-3 text-sm font-semibold">
-                Get your page
-              </Button>
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="text-sm text-neutral-400 underline-offset-4 transition hover:text-white hover:underline"
-            >
-              or peek at the leaderboard →
-            </Link>
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <Link href="/signup">
+                <Button className="px-5 py-2.5 text-sm">Make yours →</Button>
+              </Link>
+              <Link
+                href="/leaderboard"
+                className="text-sm text-neutral-500 underline-offset-4 transition hover:text-neutral-200 hover:underline"
+              >
+                who&apos;s on here?
+              </Link>
+            </div>
           </div>
 
-          {/* inline stats, factual */}
-          <div className="mt-10 flex gap-8">
-            <Stat label="price" value="$0" />
-            <Stat label="setup" value="2 min" />
-            <Stat label="catch" value="none" />
-          </div>
-        </div>
-
-        {/* real product preview */}
-        <div className="flex justify-center lg:justify-end">
-          <div className="animate-fade-in" style={{ animationDelay: "0.15s" }}>
+          {/* preview, pulled to the right, overlaps slightly on large screens */}
+          <div className="sm:mt-8 sm:translate-x-4">
             <ProfilePreview />
           </div>
         </div>
       </section>
 
-      {/* features — prose, not pills */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:grid-cols-3">
-          <Feature
-            title="Backgrounds that move"
-            body="Solid colors, gradients, a still image, or a looping video. Your call."
-          />
-          <Feature
-            title="Effects & music"
-            body="Stars, snow, glassy cards, and a music player. Toggle what you like."
-          />
-          <Feature
-            title="See who's looking"
-            body="A view counter and per-link clicks, so you know what lands."
-          />
-        </div>
+      {/* what you can do — a plain list, not a card grid */}
+      <section className="mx-auto max-w-3xl px-6 py-16">
+        <p className="font-mono text-xs text-neutral-600">{"// what's inside"}</p>
+        <ul className="mt-5 space-y-3 text-[15px] text-neutral-300">
+          <li className="flex gap-3">
+            <span className="select-none text-neutral-600">—</span>
+            <span>
+              Backgrounds: solid, gradient, an image, or a looping video clip.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="select-none text-neutral-600">—</span>
+            <span>
+              Effects and a music player. Stars, snow, glassy cards — turn them
+              on or leave them off.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="select-none text-neutral-600">—</span>
+            <span>
+              A view counter and per-link clicks, so you can tell what&apos;s
+              working.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="select-none text-neutral-600">—</span>
+            <span>
+              YouTube, Spotify and SoundCloud embeds if you want them.
+            </span>
+          </li>
+        </ul>
       </section>
 
-      {/* footer, signed */}
+      {/* closing line + footer */}
       <footer className="border-t border-white/5">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-sm text-neutral-500 sm:flex-row">
-          <p>built on a slow afternoon — hope you like it.</p>
-          <div className="flex gap-5">
-            <Link href="/signup" className="hover:text-white">
-              Sign up
+        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-mono text-xs text-neutral-600">
+            free forever · made solo
+          </p>
+          <div className="flex gap-5 text-sm text-neutral-500">
+            <Link href="/signup" className="hover:text-neutral-200">
+              sign up
             </Link>
-            <Link href="/login" className="hover:text-white">
-              Log in
+            <Link href="/login" className="hover:text-neutral-200">
+              log in
             </Link>
-            <Link href="/leaderboard" className="hover:text-white">
-              Leaderboard
+            <Link href="/leaderboard" className="hover:text-neutral-200">
+              leaderboard
             </Link>
           </div>
         </div>
       </footer>
     </main>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xl font-bold tracking-tight text-white">{value}</p>
-      <p className="text-xs uppercase tracking-wide text-neutral-600">{label}</p>
-    </div>
-  );
-}
-
-function Feature({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="bg-[#0a0a0f] p-7">
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-neutral-400">{body}</p>
-    </div>
   );
 }

@@ -129,14 +129,31 @@ export function ProfileForm({ profile }: { profile: Profile }) {
                 key={def.id}
                 type="button"
                 onClick={() => toggleBadge(def.id)}
-                className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition"
-                style={{
-                  borderColor: active ? `${def.color}` : "rgba(255,255,255,0.1)",
-                  background: active ? `${def.color}26` : "rgba(255,255,255,0.04)",
-                  color: active ? def.color : "rgb(163,163,163)",
-                }}
+                className="inline-flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3 text-xs font-semibold transition-all hover:-translate-y-0.5"
+                style={
+                  active
+                    ? {
+                        background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
+                        boxShadow: `0 4px 14px -2px ${def.color}66, inset 0 1px 0 rgba(255,255,255,0.35)`,
+                        border: `1px solid ${def.color}`,
+                        color: "#fff",
+                      }
+                    : {
+                        background: "rgba(255,255,255,0.04)",
+                        boxShadow: "none",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "rgb(163,163,163)",
+                      }
+                }
               >
-                <span aria-hidden>{def.emoji}</span>
+                <span
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] leading-none"
+                  style={{
+                    background: active ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <span aria-hidden>{def.emoji}</span>
+                </span>
                 {def.label}
               </button>
             );

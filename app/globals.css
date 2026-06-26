@@ -52,3 +52,47 @@ a {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 999px;
 }
+
+/* ---- Badge effects ---- */
+.badge-shine {
+  position: relative;
+  overflow: hidden;
+}
+.badge-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: badge-sweep 4s ease-in-out infinite;
+}
+@keyframes badge-sweep {
+  0%,
+  60% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+.badge-glow {
+  animation: badge-pulse 2.5s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.18);
+  }
+}

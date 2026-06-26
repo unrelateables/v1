@@ -8,8 +8,15 @@ import { AudioPlayer } from "./audio-player";
 import { TypingText } from "./typing-text";
 import { LinkButton } from "./link-button";
 import { EmbedBlock } from "./embed-block";
+import { BadgeChips } from "./badge-chips";
 
-export function ProfileView({ page }: { page: ProfilePage }) {
+export function ProfileView({
+  page,
+  badges = [],
+}: {
+  page: ProfilePage;
+  badges?: string[];
+}) {
   const { profile, settings, links, embeds } = page;
   const [audioOn, setAudioOn] = useState(settings.audio_autoplay);
   const trackedRef = useRef(false);
@@ -73,6 +80,8 @@ export function ProfileView({ page }: { page: ProfilePage }) {
           )}
         </h1>
         <p className="mt-1 text-sm opacity-60">@{profile.username}</p>
+
+        {badges.length > 0 && <BadgeChips badges={badges} />}
 
         {/* Bio */}
         {profile.bio && (

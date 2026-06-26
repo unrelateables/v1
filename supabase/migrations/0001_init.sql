@@ -26,8 +26,13 @@ create table if not exists public.profiles (
   avatar_url   text,
   role         user_role not null default 'user',
   banned       boolean not null default false,
+  badges       text[] not null default '{}',
   created_at   timestamptz not null default now()
 );
+
+-- Backfill the column for existing deployments (safe to re-run).
+alter table public.profiles
+  add column if not exists badges text[] not null default '{}';
 
 create table if not exists public.profile_settings (
   profile_id     uuid primary key references public.profiles(id) on delete cascade,

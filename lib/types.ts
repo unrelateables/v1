@@ -16,6 +16,7 @@ export interface Profile {
   avatar_url: string | null;
   role: "user" | "admin";
   banned: boolean;
+  badges: string[];
   created_at: string;
 }
 

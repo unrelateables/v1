@@ -5,12 +5,22 @@ import { useState } from "react";
 import { updateProfileAction } from "./actions";
 import { Button, Input, Label, Textarea } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
+import { SELECTABLE_BADGES } from "@/lib/constants";
 import type { Profile } from "@/lib/types";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
   const [state, formAction] = useFormState(updateProfileAction, undefined);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
   const [uploading, setUploading] = useState(false);
+  const [selectedBadges, setSelectedBadges] = useState<string[]>(
+    profile.badges ?? []
+  );
+
+  function toggleBadge(id: string) {
+    setSelectedBadges((prev) =>
+      prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
+    );
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -102,6 +112,40 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           rows={3}
           placeholder="Tell people who you are."
         />
+      </div>
+
+      {/* Badges */}
+      <div>
+        <Label>Exclusive badges</Label>
+        <p className="mb-3 text-xs text-neutral-500">
+          Pick the badges that show off your identity. Some badges are earned
+          automatically (views, music, early adopter) and can&apos;t be selected.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {SELECTABLE_BADGES.map((def) => {
+            const active = selectedBadges.includes(def.id);
+            return (
+              <button
+                key={def.id}
+                type="button"
+                onClick={() => toggleBadge(def.id)}
+                className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition"
+                style={{
+                  borderColor: active ? `${def.color}` : "rgba(255,255,255,0.1)",
+                  background: active ? `${def.color}26` : "rgba(255,255,255,0.04)",
+                  color: active ? def.color : "rgb(163,163,163)",
+                }}
+              >
+                <span aria-hidden>{def.emoji}</span>
+                {def.label}
+              </button>
+            );
+          })}
+        </div>
+        {/* hidden inputs so selected badges submit with the form */}
+        {selectedBadges.map((id) => (
+          <input key={id} type="hidden" name="badges" value={id} />
+        ))}
       </div>
 
       <Button type="submit">Save changes</Button>

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ProfilePreview } from "@/components/profile-preview";
 import { Spotlight } from "@/components/spotlight";
 import { Reveal } from "@/components/reveal";
+import { FujiBackdrop } from "@/components/fuji-backdrop";
 
 export default async function Landing() {
   const supabase = createClient();
@@ -24,8 +25,9 @@ export default async function Landing() {
   return (
     <main className="relative min-h-screen">
       {/* mouse-follow spotlight + drifting grid backdrop */}
-      <Spotlight />
+      <Spotlight color="251,146,60" />
       <div className="grid-bg pointer-events-none absolute inset-0 -z-10" aria-hidden />
+      <FujiBackdrop />
 
       {/* thin top accent line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />

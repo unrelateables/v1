@@ -19,19 +19,21 @@ import {
 export function ProfileView({
   page,
   badges = [],
+  preview = false,
 }: {
   page: ProfilePage;
   badges?: string[];
+  preview?: boolean;
 }) {
   const { profile, settings, links, embeds } = page;
   const [audioOn, setAudioOn] = useState(settings.audio_autoplay);
   const trackedRef = useRef(false);
 
   useEffect(() => {
-    if (trackedRef.current) return;
+    if (preview || trackedRef.current) return;
     trackedRef.current = true;
     fetch(`/api/views?profile=${profile.id}`, { method: "POST" }).catch(() => {});
-  }, [profile.id]);
+  }, [profile.id, preview]);
 
   const name = profile.display_name || profile.username;
   const isLeft = settings.layout === "left";

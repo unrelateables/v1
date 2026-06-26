@@ -6,46 +6,51 @@ export function BadgeChips({ badges }: { badges: string[] }) {
   if (!badges.length) return null;
 
   return (
-    <div className="mt-4 flex flex-wrap justify-center gap-2">
+    <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
       {badges.map((id) => {
         const def = getBadge(id);
         if (!def) return null;
-        return <Badge key={id} def={def} />;
+        return <BadgeTile key={id} def={def} />;
       })}
     </div>
   );
 }
 
-function Badge({ def }: { def: BadgeDef }) {
+function BadgeTile({ def }: { def: BadgeDef }) {
   return (
-    <span
-      title={def.label}
-      className={clsx(
-        "group relative inline-flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3 text-xs font-semibold tracking-wide backdrop-blur-md transition-transform duration-200 hover:-translate-y-0.5",
-        def.rare && "badge-glow"
-      )}
-      style={{
-        background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
-        boxShadow: `0 4px 14px -2px ${def.color}66, inset 0 1px 0 rgba(255,255,255,0.35)`,
-        border: `1px solid ${def.color}`,
-      }}
-    >
-      <span
-        className="badge-shine inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] leading-none"
+    <div className="group relative">
+      <div
+        title={def.label}
+        className={clsx(
+          "relative flex h-9 w-9 items-center justify-center rounded-xl text-base transition-transform duration-200 hover:scale-110 hover:-translate-y-0.5",
+          def.rare && "holo-ring badge-float"
+        )}
         style={{
-          background: "rgba(0,0,0,0.28)",
-          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.25)",
+          background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
+          boxShadow: `0 4px 12px -2px ${def.color}77, inset 0 1px 0 rgba(255,255,255,0.4)`,
         }}
       >
-        <span aria-hidden>{def.emoji}</span>
-      </span>
-      <span className="relative z-10 text-white drop-shadow-sm">{def.label}</span>
-      {def.rare && (
         <span
-          className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-white shadow"
-          title="Rare"
-        />
-      )}
-    </span>
+          className="badge-shine flex h-full w-full items-center justify-center overflow-hidden rounded-xl"
+          aria-hidden
+        >
+          {def.emoji}
+        </span>
+        {def.rare && (
+          <span
+            className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]"
+            title="Rare"
+          />
+        )}
+      </div>
+
+      {/* Label tooltip on hover */}
+      <span
+        className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-black/90 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 backdrop-blur transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100"
+        style={{ color: def.color }}
+      >
+        {def.label}
+      </span>
+    </div>
   );
 }

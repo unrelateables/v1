@@ -6,6 +6,7 @@ import { updateProfileAction } from "./actions";
 import { Button, Input, Label, Textarea } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import { SELECTABLE_BADGES } from "@/lib/constants";
+import { clsx } from "@/lib/utils";
 import type { Profile } from "@/lib/types";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
@@ -129,32 +130,36 @@ export function ProfileForm({ profile }: { profile: Profile }) {
                 key={def.id}
                 type="button"
                 onClick={() => toggleBadge(def.id)}
-                className="inline-flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3 text-xs font-semibold transition-all hover:-translate-y-0.5"
+                title={def.label}
+                className={clsx(
+                  "group relative flex h-10 w-10 items-center justify-center rounded-xl text-base transition-all hover:scale-110 hover:-translate-y-0.5",
+                  active && def.rare && "holo-ring"
+                )}
                 style={
                   active
                     ? {
                         background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
-                        boxShadow: `0 4px 14px -2px ${def.color}66, inset 0 1px 0 rgba(255,255,255,0.35)`,
-                        border: `1px solid ${def.color}`,
-                        color: "#fff",
+                        boxShadow: `0 4px 12px -2px ${def.color}77, inset 0 1px 0 rgba(255,255,255,0.4)`,
                       }
                     : {
-                        background: "rgba(255,255,255,0.04)",
-                        boxShadow: "none",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "rgb(163,163,163)",
+                        background: "rgba(255,255,255,0.05)",
+                        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1)",
+                        filter: "grayscale(0.6) opacity(0.5)",
                       }
                 }
               >
-                <span
-                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] leading-none"
-                  style={{
-                    background: active ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.06)",
-                  }}
-                >
-                  <span aria-hidden>{def.emoji}</span>
-                </span>
-                {def.label}
+                <span aria-hidden>{def.emoji}</span>
+                {active && def.rare && (
+                  <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]" />
+                )}
+                {active && (
+                  <span
+                    className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
+                    style={{ background: def.color, color: "#000" }}
+                  >
+                    ✓
+                  </span>
+                )}
               </button>
             );
           })}

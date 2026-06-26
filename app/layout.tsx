@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "biolink — your link, your vibe",
+  title: "biolink — one page, all your links",
   description:
-    "Create your own customizable link-in-bio page. Free, fast, and yours.",
+    "A free, customizable link-in-bio page. Backgrounds, effects, music, and analytics.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
 };
 

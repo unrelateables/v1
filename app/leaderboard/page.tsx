@@ -42,15 +42,15 @@ export default async function LeaderboardPage() {
         <div className="text-center">
           <Link
             href="/"
-            className="text-sm text-neutral-400 hover:text-white"
+            className="text-sm text-neutral-400 transition hover:text-white"
           >
             ← Home
           </Link>
-          <h1 className="mt-3 text-4xl font-black tracking-tight">
-            🏆 Leaderboard
+          <h1 className="mt-3 text-3xl font-bold tracking-tight">
+            Leaderboard
           </h1>
           <p className="mt-2 text-sm text-neutral-400">
-            The most-viewed pages on biolink. Climb the ranks!
+            Everyone on biolink, ranked by profile views.
           </p>
         </div>
 
@@ -138,7 +138,7 @@ export default async function LeaderboardPage() {
         )}
 
         <p className="mt-10 text-center text-xs text-neutral-600">
-          Updated every minute · sorted by total profile views
+          Updates every minute · sorted by total views
         </p>
       </div>
     </main>

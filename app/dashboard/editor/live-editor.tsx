@@ -114,6 +114,7 @@ export function LiveEditor({
           <p className="mt-1 text-sm text-neutral-500">
             Drag controls — the preview updates in real time.
           </p>
+          <p className="mt-1 font-mono text-[10px] text-emerald-500">editor loaded ✓</p>
         </div>
 
         {state?.error && <Msg tone="error">{state.error}</Msg>}

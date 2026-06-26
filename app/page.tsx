@@ -46,10 +46,10 @@ export default async function Landing() {
         <div className="grid items-start gap-10 sm:grid-cols-[1fr_auto]">
           <div>
             <p className="font-mono text-xs text-neutral-600">{"// v1 · free, no tiers"}</p>
-            <h1 className="font-display mt-4 text-[2.75rem] leading-[1.04] tracking-tight sm:text-6xl">
+            <h1 className="mt-4 text-[2.75rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl">
               A page for your links.
               <br />
-              <span className="italic text-neutral-500">That&apos;s the whole thing.</span>
+              <span className="font-normal text-neutral-500">That&apos;s the whole thing.</span>
             </h1>
 
             <p className="mt-5 max-w-md text-[15px] leading-relaxed text-neutral-400">

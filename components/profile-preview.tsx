@@ -28,7 +28,7 @@ export function ProfilePreview() {
             <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-neutral-800 text-base font-semibold text-neutral-300">
               M
             </div>
-            <p className="font-display mt-2.5 text-[15px] text-white">maya</p>
+            <p className="mt-2.5 text-[15px] font-semibold text-white">maya</p>
             <p className="font-mono text-[10px] text-neutral-600">@maya</p>
             <p className="mt-1.5 max-w-[12rem] text-[11px] leading-snug text-neutral-500">
               designer, occasional ghost online

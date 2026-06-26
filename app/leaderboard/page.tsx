@@ -46,7 +46,7 @@ export default async function LeaderboardPage() {
           >
             ← Home
           </Link>
-          <h1 className="font-display mt-3 text-3xl tracking-tight sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             Leaderboard
           </h1>
           <p className="mt-2 text-sm text-neutral-400">

@@ -2,12 +2,39 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import { ProfileView } from "@/components/profile/profile-view";
-import type { ProfilePage } from "@/lib/types";
+import type { ProfilePage, ProfileSettings } from "@/lib/types";
 import { getProfileBadges } from "@/lib/badges";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "http://localhost:3000";
+
+const DEFAULTS: Partial<ProfileSettings> = {
+  bg_overlay: 30,
+  layout: "centered",
+  text_align: "center",
+  font_family: "sans",
+  radius: "full",
+  button_style: "glass",
+  button_size: "md",
+  name_size: "md",
+  avatar_shape: "circle",
+  link_layout: "list",
+  show_views: true,
+  show_footer: true,
+  custom_css: null,
+  template: "default",
+  glassmorphism: true,
+  typing_effect: false,
+  is_public: true,
+  audio_autoplay: false,
+  bg_type: "solid",
+  bg_value: null,
+  accent_color: "#6366f1",
+  text_color: "#ffffff",
+  audio_url: null,
+  effects: { particles: "none", snow: false, rain: false },
+};
 
 export async function generateMetadata({
   params,
@@ -74,9 +101,12 @@ export default async function UsernamePage({
 
   if (!settings?.is_public) notFound();
 
+  // Merge defaults for any columns missing from the DB.
+  const safeSettings = { ...DEFAULTS, ...settings } as ProfileSettings;
+
   const page: ProfilePage = {
     profile,
-    settings,
+    settings: safeSettings,
     links: links ?? [],
     embeds: embeds ?? [],
   };

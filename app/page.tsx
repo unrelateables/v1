@@ -6,6 +6,8 @@ import { ProfilePreview } from "@/components/profile-preview";
 import { Spotlight } from "@/components/spotlight";
 import { Reveal } from "@/components/reveal";
 import { FujiBackdrop } from "@/components/fuji-backdrop";
+import { FeatureShowcase } from "@/components/feature-showcase";
+import { FinalCta } from "@/components/final-cta";
 
 export default async function Landing() {
   const supabase = createClient();
@@ -125,6 +127,12 @@ export default async function Landing() {
           ))}
         </ul>
       </section>
+
+      {/* visual theme + effects showcase */}
+      <FeatureShowcase />
+
+      {/* final conversion push */}
+      <FinalCta />
 
       {/* closing line + footer */}
       <footer className="border-t border-white/5">

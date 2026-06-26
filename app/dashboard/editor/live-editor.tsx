@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Component, useState, useMemo } from "react";
 import { updateAppearanceAction } from "../appearance/actions";
 import { ProfileView } from "@/components/profile/profile-view";
 import { Button, Input, Label } from "@/components/ui";
@@ -14,6 +14,27 @@ import type {
   ProfilePage,
   BgType,
 } from "@/lib/types";
+
+class ErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { error: string | null }
+> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(e: Error) {
+    return { error: e.message };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-300">
+          <p className="font-semibold">Preview error</p>
+          <p className="mt-1 text-xs text-red-400/70">{this.state.error}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export function LiveEditor({
   profile,
@@ -34,7 +55,6 @@ export function LiveEditor({
     setSettings((s) => ({ ...s, [key]: value }));
   }
 
-  // live preview page — derived from current settings state
   const page: ProfilePage = useMemo(
     () => ({ profile, settings, links, embeds }),
     [profile, settings, links, embeds]
@@ -220,7 +240,6 @@ export function LiveEditor({
       {/* LIVE PREVIEW */}
       <div className="order-1 w-full lg:order-2 lg:sticky lg:top-4">
         <div className="overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
-          {/* browser chrome */}
           <div className="flex items-center gap-1.5 border-b border-white/5 bg-black/40 px-4 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-neutral-700" />
             <span className="h-2.5 w-2.5 rounded-full bg-neutral-700" />
@@ -230,7 +249,9 @@ export function LiveEditor({
             </span>
           </div>
           <div className="h-[560px] overflow-y-auto">
-            <ProfileView page={page} preview />
+            <ErrorBoundary>
+              <ProfileView page={page} preview />
+            </ErrorBoundary>
           </div>
         </div>
         <p className="mt-2 text-center text-xs text-neutral-600">
@@ -241,7 +262,6 @@ export function LiveEditor({
   );
 }
 
-/* ---- small controls ---- */
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-3xl border border-white/[0.07] bg-white/[0.02] p-4">

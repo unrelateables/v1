@@ -3,11 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import {
-  isReservedUsername,
-  USERNAME_REGEX,
-  SELECTABLE_BADGES,
-} from "@/lib/constants";
+import { isReservedUsername, USERNAME_REGEX } from "@/lib/constants";
 
 export type FormState = { error?: string; success?: boolean } | undefined;
 
@@ -25,12 +21,6 @@ export async function updateProfileAction(
   const bio = String(formData.get("bio") || "").trim().slice(0, 280);
   const username = String(formData.get("username") || "").trim();
   const avatarUrl = String(formData.get("avatar_url") || "").trim() || null;
-
-  // collect selected badges (only allow user-selectable ones)
-  const selectedBadges = formData.getAll("badges").map(String);
-  const validBadges = selectedBadges.filter((b) =>
-    SELECTABLE_BADGES.some((def) => def.id === b)
-  );
 
   if (!username || username.length < 3 || username.length > 24 || !USERNAME_REGEX.test(username)) {
     return { error: "Username must be 3-24 chars: letters, numbers, underscore." };
@@ -55,7 +45,6 @@ export async function updateProfileAction(
       bio: bio || null,
       username,
       avatar_url: avatarUrl,
-      badges: validBadges,
     })
     .eq("id", user.id);
 

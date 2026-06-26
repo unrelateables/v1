@@ -5,23 +5,12 @@ import { useState } from "react";
 import { updateProfileAction } from "./actions";
 import { Button, Input, Label, Textarea } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
-import { SELECTABLE_BADGES } from "@/lib/constants";
-import { clsx } from "@/lib/utils";
 import type { Profile } from "@/lib/types";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
   const [state, formAction] = useFormState(updateProfileAction, undefined);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
   const [uploading, setUploading] = useState(false);
-  const [selectedBadges, setSelectedBadges] = useState<string[]>(
-    profile.badges ?? []
-  );
-
-  function toggleBadge(id: string) {
-    setSelectedBadges((prev) =>
-      prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
-    );
-  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -116,59 +105,14 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       </div>
 
       {/* Badges */}
-      <div>
-        <Label>Exclusive badges</Label>
-        <p className="mb-3 text-xs text-neutral-500">
-          Pick the badges that show off your identity. Some badges are earned
-          automatically (views, music, early adopter) and can&apos;t be selected.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {SELECTABLE_BADGES.map((def) => {
-            const active = selectedBadges.includes(def.id);
-            return (
-              <button
-                key={def.id}
-                type="button"
-                onClick={() => toggleBadge(def.id)}
-                title={def.label}
-                className={clsx(
-                  "group relative flex h-10 w-10 items-center justify-center rounded-xl text-base transition-all hover:scale-110 hover:-translate-y-0.5",
-                  active && def.rare && "holo-ring"
-                )}
-                style={
-                  active
-                    ? {
-                        background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
-                        boxShadow: `0 4px 12px -2px ${def.color}77, inset 0 1px 0 rgba(255,255,255,0.4)`,
-                      }
-                    : {
-                        background: "rgba(255,255,255,0.05)",
-                        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1)",
-                        filter: "grayscale(0.6) opacity(0.5)",
-                      }
-                }
-              >
-                <span aria-hidden>{def.emoji}</span>
-                {active && def.rare && (
-                  <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]" />
-                )}
-                {active && (
-                  <span
-                    className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
-                    style={{ background: def.color, color: "#000" }}
-                  >
-                    ✓
-                  </span>
-                )}
-              </button>
-            );
-          })}
+      {profile.role === "admin" && (
+        <div className="glass rounded-2xl p-4">
+          <p className="text-xs text-neutral-500">
+            You have the exclusive <span className="text-amber-400">Owner</span>{" "}
+            badge. It&apos;s shown only on your page.
+          </p>
         </div>
-        {/* hidden inputs so selected badges submit with the form */}
-        {selectedBadges.map((id) => (
-          <input key={id} type="hidden" name="badges" value={id} />
-        ))}
-      </div>
+      )}
 
       <Button type="submit">Save changes</Button>
     </form>

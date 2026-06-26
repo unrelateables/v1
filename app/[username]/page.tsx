@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import { ProfileView } from "@/components/profile/profile-view";
 import type { ProfilePage } from "@/lib/types";
-import { computeAutoBadges, resolveBadges } from "@/lib/badges";
+import { getProfileBadges } from "@/lib/badges";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
@@ -66,15 +66,10 @@ export default async function UsernamePage({
     { data: settings },
     { data: links },
     { data: embeds },
-    { count: viewCount },
   ] = await Promise.all([
     supabase.from("profile_settings").select("*").eq("profile_id", profile.id).single(),
     supabase.from("links").select("*").eq("profile_id", profile.id).order("position"),
     supabase.from("embeds").select("*").eq("profile_id", profile.id).order("position"),
-    supabase
-      .from("views")
-      .select("*", { count: "exact", head: true })
-      .eq("profile_id", profile.id),
   ]);
 
   if (!settings?.is_public) notFound();
@@ -86,10 +81,7 @@ export default async function UsernamePage({
     embeds: embeds ?? [],
   };
 
-  const badges = resolveBadges(
-    profile.badges,
-    computeAutoBadges(page, viewCount ?? 0)
-  );
+  const badges = getProfileBadges(profile);
 
   return <ProfileView page={page} badges={badges} />;
 }

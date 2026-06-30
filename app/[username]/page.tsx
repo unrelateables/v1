@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Metadata } from "next";
 import { ProfileView } from "@/components/profile/profile-view";
-import type { ProfilePage, ProfileSettings } from "@/lib/types";
+import type { ProfilePage } from "@/lib/types";
 import { getProfileBadges } from "@/lib/badges";
 import { safeSettings } from "@/lib/defaults";
 
@@ -47,47 +48,54 @@ export async function generateMetadata({
 }
 
 export const revalidate = 0;
-export const dynamic = "force-dynamic";
 
 export default async function UsernamePage({
   params,
 }: {
   params: { username: string };
 }) {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("username", params.username)
-      .maybeSingle();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("username", params.username)
+    .maybeSingle();
 
-    if (!profile || profile.banned) notFound();
+  // No profile or banned → 404
+  if (!profile || profile.banned) notFound();
 
-    const [
-      { data: rawSettings },
-      { data: links },
-      { data: embeds },
-    ] = await Promise.all([
-      supabase.from("profile_settings").select("*").eq("profile_id", profile.id).single(),
-      supabase.from("links").select("*").eq("profile_id", profile.id).order("position"),
-      supabase.from("embeds").select("*").eq("profile_id", profile.id).order("position"),
-    ]);
+  // Use maybeSingle so missing settings row returns null (not an error)
+  const { data: rawSettings } = await supabase
+    .from("profile_settings")
+    .select("*")
+    .eq("profile_id", profile.id)
+    .maybeSingle();
 
-    const settings = safeSettings(rawSettings);
-    if (!settings.is_public) notFound();
+  const settings = safeSettings(rawSettings);
 
-    const page: ProfilePage = {
-      profile,
-      settings,
-      links: links ?? [],
-      embeds: embeds ?? [],
-    };
+  // If settings exist and explicitly set to private → 404
+  if (rawSettings && rawSettings.is_public === false) notFound();
 
-    const badges = getProfileBadges(profile);
-    return <ProfileView page={page} badges={badges} />;
-  } catch {
-    notFound();
-  }
+  const { data: links } = await supabase
+    .from("links")
+    .select("*")
+    .eq("profile_id", profile.id)
+    .order("position");
+
+  const { data: embeds } = await supabase
+    .from("embeds")
+    .select("*")
+    .eq("profile_id", profile.id)
+    .order("position");
+
+  const page: ProfilePage = {
+    profile,
+    settings,
+    links: links ?? [],
+    embeds: embeds ?? [],
+  };
+
+  const badges = getProfileBadges(profile);
+  return <ProfileView page={page} badges={badges} />;
 }

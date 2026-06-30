@@ -47,35 +47,72 @@ export async function generateMetadata({
   };
 }
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function UsernamePage({
   params,
+  searchParams,
 }: {
   params: { username: string };
+  searchParams: { debug?: string };
 }) {
+  const debug = searchParams.debug === "1";
   const supabase = createClient();
+  const admin = createAdminClient();
 
-  const { data: profile } = await supabase
+  // Query profile case-insensitively
+  const { data: profile, error: profileErr } = await supabase
     .from("profiles")
     .select("*")
-    .eq("username", params.username)
+    .ilike("username", params.username)
     .maybeSingle();
 
-  // No profile or banned → 404
-  if (!profile || profile.banned) notFound();
+  if (debug) {
+    return (
+      <main className="min-h-screen bg-neutral-950 p-8 font-mono text-xs text-neutral-300">
+        <h1 className="mb-4 text-lg font-bold text-white">DEBUG: @{params.username}</h1>
+        <pre className="whitespace-pre-wrap rounded-xl border border-white/10 bg-black/40 p-4">
+{`PROFILE QUERY:
+  error: ${profileErr?.message || "none"}
+  found: ${profile ? "YES" : "NO"}
+  data:  ${JSON.stringify(profile, null, 2)}`}
+        </pre>
+      </main>
+    );
+  }
 
-  // Use maybeSingle so missing settings row returns null (not an error)
-  const { data: rawSettings } = await supabase
+  if (!profile) {
+    notFound();
+  }
+
+  if (profile.banned) {
+    notFound();
+  }
+
+  // Self-heal: create settings row if missing
+  let { data: rawSettings } = await supabase
     .from("profile_settings")
     .select("*")
     .eq("profile_id", profile.id)
     .maybeSingle();
 
+  if (!rawSettings) {
+    await admin.from("profile_settings").insert({ profile_id: profile.id }).select();
+    const { data: created } = await supabase
+      .from("profile_settings")
+      .select("*")
+      .eq("profile_id", profile.id)
+      .maybeSingle();
+    rawSettings = created;
+  }
+
   const settings = safeSettings(rawSettings);
 
-  // If settings exist and explicitly set to private → 404
-  if (rawSettings && rawSettings.is_public === false) notFound();
+  // Only 404 if explicitly private (and we have settings)
+  if (rawSettings && rawSettings.is_public === false) {
+    notFound();
+  }
 
   const { data: links } = await supabase
     .from("links")

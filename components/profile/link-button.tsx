@@ -1,8 +1,16 @@
 "use client";
 
-import type { Link } from "@/lib/types";
-import type { ButtonStyle, ButtonSize, Radius, LinkLayout } from "@/lib/types";
+import type { Link, ButtonStyle, ButtonSize, Radius, LinkLayout } from "@/lib/types";
 import { RADIUS, BUTTON_PADDING } from "@/lib/design";
+
+function isImageUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function LinkButton({
   link,
@@ -54,7 +62,6 @@ export function LinkButton({
       className += "bg-transparent hover:bg-white/[0.04] ";
       style.border = "none";
       style.borderBottom = `1px solid ${accent}22`;
-      rad ? null : null;
       style.borderRadius = rad;
       break;
     case "glass":
@@ -66,6 +73,8 @@ export function LinkButton({
       break;
   }
 
+  const showImageIcon = link.icon ? isImageUrl(link.icon) : false;
+
   return (
     <a
       href={link.url}
@@ -75,8 +84,21 @@ export function LinkButton({
       className={className}
       style={style}
     >
-      {link.icon && <span className="text-base">{link.icon}</span>}
-      <span className={isGrid ? "truncate" : "flex-1 " + (isGrid ? "" : "")}>
+      {link.icon && (
+        <span className="flex-shrink-0 text-base">
+          {showImageIcon ? (
+            <img
+              src={link.icon}
+              alt=""
+              className="h-5 w-5 rounded object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <span>{link.icon}</span>
+          )}
+        </span>
+      )}
+      <span className={isGrid ? "truncate" : "flex-1"}>
         {link.title}
       </span>
       {!isGrid && (
@@ -84,7 +106,7 @@ export function LinkButton({
           className="opacity-0 transition group-hover:opacity-60"
           style={{ color: accent }}
         >
-          ↗
+          {"\u2197"}
         </span>
       )}
     </a>

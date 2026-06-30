@@ -24,6 +24,11 @@ export function BackgroundLayer({
     style.backgroundSize = "cover";
     style.backgroundPosition = "center";
     style.backgroundAttachment = "fixed";
+  } else if (bgType === "gif" && bgValue) {
+    style.backgroundImage = `url(${bgValue})`;
+    style.backgroundSize = "cover";
+    style.backgroundPosition = "center";
+    style.backgroundAttachment = "fixed";
   }
 
   const overlayOpacity = overlay / 100;

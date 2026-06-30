@@ -1,4 +1,4 @@
-export type BgType = "solid" | "gradient" | "image" | "video";
+export type BgType = "solid" | "gradient" | "image" | "gif" | "video";
 export type ParticleEffect = "none" | "stars" | "hearts";
 export type Layout = "centered" | "left" | "card";
 export type TextAlign = "center" | "left";
@@ -62,7 +62,7 @@ export interface Link {
   profile_id: string;
   title: string;
   url: string;
-  icon: string | null;
+  icon: string | null; // Can be emoji text or image/GIF URL
   position: number;
   created_at: string;
 }

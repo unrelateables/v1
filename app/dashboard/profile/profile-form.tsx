@@ -66,10 +66,10 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <div>
           <label className="cursor-pointer rounded-xl bg-white/5 px-4 py-2 text-sm hover:bg-white/10">
             {uploading ? "Uploading..." : "Upload avatar"}
-            <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+            <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={handleFile} />
           </label>
           <input type="hidden" name="avatar_url" value={avatarUrl} />
-          <p className="mt-1.5 text-xs text-neutral-500">PNG, JPG, GIF. Stored in Supabase.</p>
+          <p className="mt-1.5 text-xs text-neutral-500">PNG, JPG, GIF, WebP. Animated GIFs work.</p>
         </div>
       </div>
 

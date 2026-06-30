@@ -12,6 +12,7 @@ const BG_TYPES: { value: BgType; label: string }[] = [
   { value: "solid", label: "Solid" },
   { value: "gradient", label: "Gradient" },
   { value: "image", label: "Image" },
+  { value: "gif", label: "GIF" },
   { value: "video", label: "Video" },
 ];
 
@@ -22,8 +23,8 @@ export function AppearanceForm({ settings }: { settings: ProfileSettings }) {
   const bgPlaceholder =
     bgType === "gradient"
       ? "linear-gradient(135deg,#6366f1,#ec4899)"
-      : bgType === "image"
-      ? "https://...jpg"
+      : bgType === "image" || bgType === "gif"
+      ? "https://...gif"
       : bgType === "video"
       ? "https://...mp4"
       : "#0a0a0a";
@@ -56,10 +57,10 @@ export function AppearanceForm({ settings }: { settings: ProfileSettings }) {
             </button>
           ))}
         </div>
-        <Label htmlFor="bg_value">
+<Label htmlFor="bg_value">
           {bgType === "gradient"
             ? "gradient (css)"
-            : bgType === "image" || bgType === "video"
+            : bgType === "image" || bgType === "gif"
             ? "url (hotlinked)"
             : "color (hex)"}
         </Label>

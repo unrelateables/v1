@@ -175,6 +175,7 @@ export const BG_TYPES: { value: BgType; label: string }[] = [
   { value: "solid", label: "Solid" },
   { value: "gradient", label: "Gradient" },
   { value: "image", label: "Image" },
+  { value: "gif", label: "GIF" },
   { value: "video", label: "Video" },
 ];
 

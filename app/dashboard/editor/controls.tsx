@@ -1,6 +1,7 @@
 "use client";
 
 import { clsx } from "@/lib/utils";
+import { MusicPicker } from "./music-picker";
 import type {
   BgType,
   Layout,
@@ -414,18 +415,10 @@ export function Controls({
 
       {/* Music */}
       <Section title="music">
-        <div>
-          <p className="mb-2 font-mono text-[11px] uppercase tracking-wide text-neutral-500">
-            Audio URL
-          </p>
-          <input
-            type="url"
-            value={state.audio_url || ""}
-            onChange={(e) => patch({ audio_url: e.target.value || null })}
-            placeholder="https://...mp3"
-            className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
-          />
-        </div>
+        <MusicPicker
+          value={state.audio_url}
+          onPick={(url) => patch({ audio_url: url })}
+        />
         <Toggle
           label="Autoplay"
           checked={state.audio_autoplay}

@@ -289,6 +289,29 @@ create policy "avatars_owner_delete" on storage.objects
     and (auth.uid()::text = (storage.foldername(name))[1])
   );
 
+-- ---------- Storage bucket for audio (user-uploaded songs) ----------
+insert into storage.buckets (id, name, public)
+values ('audio', 'audio', true)
+on conflict (id) do nothing;
+
+drop policy if exists "audio_public_read" on storage.objects;
+create policy "audio_public_read" on storage.objects
+  for select using (bucket_id = 'audio');
+
+drop policy if exists "audio_owner_write" on storage.objects;
+create policy "audio_owner_write" on storage.objects
+  for insert to authenticated with check (
+    bucket_id = 'audio'
+    and (auth.uid()::text = (storage.foldername(name))[1])
+  );
+
+drop policy if exists "audio_owner_delete" on storage.objects;
+create policy "audio_owner_delete" on storage.objects
+  for delete to authenticated using (
+    bucket_id = 'audio'
+    and (auth.uid()::text = (storage.foldername(name))[1])
+  );
+
 -- ============================================================================
 -- Leaderboard: profiles ranked by view count (public profiles only).
 -- Safe to re-run.

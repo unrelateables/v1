@@ -56,6 +56,35 @@ export async function saveEditorAction(settings: ProfileSettings) {
   return { success: true };
 }
 
+/** Upload an audio file to Supabase storage and return the public URL. */
+export async function uploadAudioAction(formData: FormData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const file = formData.get("file") as File | null;
+  if (!file) return { error: "No file selected." };
+
+  const sizeMB = file.size / (1024 * 1024);
+  if (sizeMB > 10) return { error: "Audio must be under 10MB." };
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "mp3";
+  const allowed = ["mp3", "wav", "ogg", "m4a", "aac"];
+  if (!allowed.includes(ext)) return { error: `Use one of: ${allowed.join(", ")}` };
+
+  const path = `${user.id}/audio.${ext}`;
+  const { error: upErr } = await supabase.storage
+    .from("audio")
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (upErr) return { error: upErr.message };
+
+  const { data } = supabase.storage.from("audio").getPublicUrl(path);
+  return { url: `${data.publicUrl}?t=${Date.now()}` };
+}
+
 export async function applyTemplateAction(templateId: string) {
   const supabase = createClient();
   const {

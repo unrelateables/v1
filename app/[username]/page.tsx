@@ -91,14 +91,22 @@ export default async function UsernamePage({
   }
 
   // Self-heal: create settings row if missing
-  let { data: rawSettings } = await supabase
+  let { data: rawSettings, error: settingsErr } = await supabase
     .from("profile_settings")
     .select("*")
     .eq("profile_id", profile.id)
     .maybeSingle();
 
+  let settingsDebug = "exists";
+
   if (!rawSettings) {
-    await admin.from("profile_settings").insert({ profile_id: profile.id }).select();
+    settingsDebug = "missing, creating...";
+    const { error: insErr } = await admin
+      .from("profile_settings")
+      .insert({ profile_id: profile.id });
+    if (insErr) {
+      settingsDebug = `insert failed: ${insErr.message}`;
+    }
     const { data: created } = await supabase
       .from("profile_settings")
       .select("*")
@@ -109,8 +117,27 @@ export default async function UsernamePage({
 
   const settings = safeSettings(rawSettings);
 
+  // Show the privacy gate + settings in debug
+  const isPrivate = rawSettings && rawSettings.is_public === false;
+
+  if (debug) {
+    return (
+      <main className="min-h-screen bg-neutral-950 p-8 font-mono text-xs text-neutral-300">
+        <h1 className="mb-4 text-lg font-bold text-white">DEBUG: @{params.username}</h1>
+        <pre className="whitespace-pre-wrap rounded-xl border border-white/10 bg-black/40 p-4">
+{`SETTINGS QUERY:
+  error: ${settingsErr?.message || "none"}
+  status: ${settingsDebug}
+  is_public: ${rawSettings?.is_public}
+  GATE: ${isPrivate ? "PRIVATE -> 404" : "PUBLIC -> render"}
+  data:  ${JSON.stringify(rawSettings, null, 2)}`}
+        </pre>
+      </main>
+    );
+  }
+
   // Only 404 if explicitly private (and we have settings)
-  if (rawSettings && rawSettings.is_public === false) {
+  if (isPrivate) {
     notFound();
   }
 

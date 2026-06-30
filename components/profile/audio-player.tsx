@@ -35,21 +35,43 @@ export function AudioPlayer({
     }
   }, [on, url]);
 
-  // If user wanted autoplay but it was blocked, listen for first interaction
+  // If autoplay was blocked, grab the first sign of life — mouse move, scroll,
+  // key, touch, anything — and start music instantly. Feels automatic.
   useEffect(() => {
     if (!needsTap) return;
     const audio = audioRef.current;
+    let started = false;
     function start() {
+      if (started) return;
+      started = true;
       audio
         ?.play()
         .then(() => {
           setPlaying(true);
           setNeedsTap(false);
         })
-        .catch(() => {});
+        .catch(() => {
+          started = false;
+        });
+      cleanup();
     }
-    window.addEventListener("pointerdown", start, { once: true });
-    return () => window.removeEventListener("pointerdown", start);
+    function cleanup() {
+      window.removeEventListener("pointerdown", start);
+      window.removeEventListener("pointermove", start);
+      window.removeEventListener("mousemove", start);
+      window.removeEventListener("touchstart", start);
+      window.removeEventListener("scroll", start, true);
+      window.removeEventListener("keydown", start);
+      window.removeEventListener("wheel", start);
+    }
+    window.addEventListener("pointerdown", start);
+    window.addEventListener("pointermove", start, { passive: true });
+    window.addEventListener("mousemove", start, { passive: true });
+    window.addEventListener("touchstart", start, { passive: true });
+    window.addEventListener("scroll", start, true);
+    window.addEventListener("keydown", start);
+    window.addEventListener("wheel", start, { passive: true });
+    return cleanup;
   }, [needsTap]);
 
   return (

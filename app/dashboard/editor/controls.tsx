@@ -295,16 +295,28 @@ export function Toggle({
 export function Section({
   title,
   children,
+  defaultOpen = false,
 }: {
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-3xl border border-white/[0.06] bg-white/[0.02] p-4">
-      <h3 className="mb-3 font-mono text-[11px] uppercase tracking-wide text-neutral-500">
-        {title}
-      </h3>
-      <div className="space-y-4">{children}</div>
+    <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-white/[0.02]"
+      >
+        <span className="font-mono text-[11px] uppercase tracking-wide text-neutral-400">
+          {title}
+        </span>
+        <span className={`text-neutral-500 transition-transform ${open ? "rotate-90" : ""}`}>
+          {"\u203A"}
+        </span>
+      </button>
+      {open && <div className="space-y-4 px-4 pb-4">{children}</div>}
     </div>
   );
 }
@@ -539,8 +551,53 @@ export function Controls({
         />
       </Section>
 
-      {/* Effects */}
-      <Section title="effects">
+      {/* Username effects */}
+      <Section title="username effects">
+        <PillSelect
+          label="Effect"
+          value={state.username_effect}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "typewriter" as const, label: "Type" },
+            { value: "rainbow" as const, label: "Rainbow" },
+            { value: "glitch" as const, label: "Glitch" },
+            { value: "wave" as const, label: "Wave" },
+          ]}
+          onChange={(v) => patch({ username_effect: v })}
+        />
+      </Section>
+
+      {/* Hover & cursor effects */}
+      <Section title="hover & cursor">
+        <PillSelect
+          label="Button hover"
+          value={state.hover_effect}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "glow" as const, label: "Glow" },
+            { value: "pulse" as const, label: "Pulse" },
+            { value: "shake" as const, label: "Shake" },
+            { value: "lift" as const, label: "Lift" },
+          ]}
+          onChange={(v) => patch({ hover_effect: v })}
+        />
+        <PillSelect
+          label="Cursor trail"
+          value={state.cursor_effect}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "spark" as const, label: "Spark" },
+            { value: "rainbow" as const, label: "Rainbow" },
+            { value: "trail" as const, label: "Trail" },
+            { value: "ripple" as const, label: "Ripple" },
+            { value: "hearts" as const, label: "Hearts" },
+          ]}
+          onChange={(v) => patch({ cursor_effect: v })}
+        />
+      </Section>
+
+      {/* Advanced effects */}
+      <Section title="advanced effects">
         <PillSelect
           label="Particles"
           value={state.effects.particles}
@@ -553,6 +610,60 @@ export function Controls({
             patch({ effects: { ...state.effects, particles: v } })
           }
         />
+        <PillSelect
+          label="Page entry"
+          value={state.page_entry}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "fade" as const, label: "Fade" },
+            { value: "slide-up" as const, label: "Slide" },
+            { value: "zoom" as const, label: "Zoom" },
+            { value: "blur" as const, label: "Blur" },
+            { value: "flip" as const, label: "Flip" },
+          ]}
+          onChange={(v) => patch({ page_entry: v })}
+        />
+        <PillSelect
+          label="Border glow"
+          value={state.border_glow}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "accent" as const, label: "Accent" },
+            { value: "rainbow" as const, label: "Rainbow" },
+            { value: "soft" as const, label: "Soft" },
+            { value: "pulse" as const, label: "Pulse" },
+            { value: "shake" as const, label: "Shake" },
+          ]}
+          onChange={(v) => patch({ border_glow: v })}
+        />
+        <PillSelect
+          label="Overlay type"
+          value={state.gradient_overlay}
+          options={[
+            { value: "none" as const, label: "None" },
+            { value: "dark" as const, label: "Dark" },
+            { value: "light" as const, label: "Light" },
+            { value: "gradient-v" as const, label: "Grad V" },
+            { value: "gradient-h" as const, label: "Grad H" },
+            { value: "vignette" as const, label: "Vignette" },
+            { value: "radial" as const, label: "Radial" },
+          ]}
+          onChange={(v) => patch({ gradient_overlay: v })}
+        />
+        {state.gradient_overlay !== "none" && (
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker
+              label="Overlay c1"
+              value={state.overlay_color1 || "#000000"}
+              onChange={(v) => patch({ overlay_color1: v })}
+            />
+            <ColorPicker
+              label="Overlay c2"
+              value={state.overlay_color2 || "#000000"}
+              onChange={(v) => patch({ overlay_color2: v })}
+            />
+          </div>
+        )}
         <Toggle
           label="Snow"
           checked={state.effects.snow}
@@ -572,6 +683,11 @@ export function Controls({
           label="Typing effect"
           checked={state.typing_effect}
           onChange={(v) => patch({ typing_effect: v })}
+        />
+        <Toggle
+          label="Monochrome icons"
+          checked={state.monochrome_icons}
+          onChange={(v) => patch({ monochrome_icons: v })}
         />
       </Section>
 

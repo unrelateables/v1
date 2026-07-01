@@ -26,6 +26,18 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   show_footer: true,
   custom_css: null,
   template: "default",
+  // New effect fields
+  gradient_overlay: "none",
+  overlay_color1: "#6366f1",
+  overlay_color2: "#0a0a0a",
+  overlay_intensity: 40,
+  border_glow: "none",
+  page_entry: "fade",
+  username_effect: "none",
+  hover_effect: "lift",
+  cursor_effect: "none",
+  monochrome_icons: false,
+  custom_font: "none",
 };
 
 /** Merge raw DB row with safe defaults. Never returns undefined fields. */

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Link, ButtonStyle, ButtonSize, Radius, LinkLayout } from "@/lib/types";
+import type { Link, ButtonStyle, ButtonSize, Radius, LinkLayout, HoverEffect } from "@/lib/types";
 import { RADIUS, BUTTON_PADDING } from "@/lib/design";
 
 function isImageUrl(str: string): boolean {
@@ -12,6 +12,15 @@ function isImageUrl(str: string): boolean {
   }
 }
 
+const HOVER_CLASS: Record<HoverEffect, string> = {
+  none: "",
+  glow: "hover-fx-glow",
+  pulse: "hover-fx-pulse",
+  shake: "hover-fx-shake",
+  lift: "hover:-translate-y-1",
+  slide: "hover-fx-slide",
+};
+
 export function LinkButton({
   link,
   accent,
@@ -20,6 +29,8 @@ export function LinkButton({
   buttonSize,
   radius,
   layout,
+  hoverEffect = "none",
+  monochrome = false,
 }: {
   link: Link;
   accent: string;
@@ -28,6 +39,8 @@ export function LinkButton({
   buttonSize: ButtonSize;
   radius: Radius;
   layout: LinkLayout;
+  hoverEffect?: HoverEffect;
+  monochrome?: boolean;
 }) {
   function trackClick() {
     try {

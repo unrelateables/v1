@@ -9,12 +9,29 @@ import { TypingText } from "./typing-text";
 import { LinkButton } from "./link-button";
 import { EmbedBlock } from "./embed-block";
 import { BadgeChips } from "./badge-chips";
+import { CursorEffect as CursorEffectLayer } from "./cursor-effect";
+import { UsernameText } from "./username-effects";
 import {
   FONT_STACKS,
   RADIUS,
   NAME_SIZE,
   avatarRadiusClass,
 } from "@/lib/design";
+import type {
+  PageEntry,
+  UsernameEffectType,
+  HoverEffect,
+  CursorEffectType,
+} from "@/lib/types";
+
+const PAGE_ANIM_CLASS: Record<PageEntry, string> = {
+  none: "",
+  fade: "animate-fade-in",
+  "slide-up": "animate-slide-in",
+  zoom: "animate-zoom-in",
+  flip: "animate-flip-in",
+  blur: "animate-fade-in",
+};
 
 export function ProfileView({
   page,
@@ -41,12 +58,40 @@ export function ProfileView({
   const rad = RADIUS[settings.radius];
   const isGrid = settings.link_layout === "grid";
 
+  const pageAnim = PAGE_ANIM_CLASS[settings.page_entry as PageEntry] || "";
   const alignClass = settings.text_align === "left" || isLeft ? "items-start text-left" : "items-center text-center";
   const containerClass = isLeft
-    ? "relative z-10 flex w-full max-w-md flex-col items-start text-left animate-fade-in"
-    : "relative z-10 flex w-full max-w-md flex-col items-center text-center animate-fade-in";
+    ? `relative z-10 flex w-full max-w-md flex-col items-start text-left ${pageAnim}`
+    : `relative z-10 flex w-full max-w-md flex-col items-center text-center ${pageAnim}`;
 
   const embedGlass = settings.glassmorphism;
+
+  // Gradient overlay style
+  const overlayStyle: React.CSSProperties =
+    settings.gradient_overlay !== "none" && settings.overlay_color1 && settings.overlay_color2
+      ? {
+          background: settings.gradient_overlay === "radial"
+            ? `radial-gradient(circle, ${settings.overlay_color1}, ${settings.overlay_color2})`
+            : `linear-gradient(135deg, ${settings.overlay_color1}, ${settings.overlay_color2})`,
+          opacity: (settings.overlay_intensity ?? 40) / 100,
+        }
+      : {};
+
+  // Border glow style
+  const glowStyle: React.CSSProperties = settings.border_glow !== "none"
+    ? {
+        boxShadow:
+          settings.border_glow === "pulse"
+            ? `0 0 20px ${settings.accent_color}, 0 0 40px ${settings.accent_color}66`
+            : settings.border_glow === "shake"
+            ? `0 0 15px ${settings.accent_color}`
+            : `0 0 25px ${settings.accent_color}, 0 0 50px ${settings.accent_color}44`,
+      }
+    : {};
+
+  // Determine username rendering
+  const showTypewriter = settings.typing_effect || settings.username_effect === "typewriter";
+  const usernameEffect: UsernameEffectType = settings.username_effect;
 
   return (
     <main
@@ -60,14 +105,24 @@ export function ProfileView({
         overlay={settings.bg_overlay}
       />
 
+      {/* Gradient overlay */}
+      {settings.gradient_overlay !== "none" && settings.overlay_color1 && (
+        <div className="pointer-events-none fixed inset-0 -z-10" style={overlayStyle} />
+      )}
+
       <EffectsLayer effects={settings.effects} accent={settings.accent_color} />
 
-      {/* Custom CSS injection — scoped under .biolink-root */}
+      {/* Cursor effects */}
+      {settings.cursor_effect !== "none" && (
+        <CursorEffectLayer effect={settings.cursor_effect} />
+      )}
+
+      {/* Custom CSS injection */}
       {settings.custom_css && (
         <style dangerouslySetInnerHTML={{ __html: `.biolink-root ${settings.custom_css}` }} />
       )}
 
-      <div className={"biolink-root " + containerClass}>
+      <div className={"biolink-root " + containerClass} style={glowStyle}>
         {/* Avatar */}
         <div className="mb-5">
           {profile.avatar_url ? (
@@ -76,7 +131,11 @@ export function ProfileView({
               src={profile.avatar_url}
               alt={name}
               className={`h-24 w-24 border-2 object-cover shadow-xl ${avatarClass}`}
-              style={{ borderColor: settings.accent_color, borderRadius: settings.avatar_shape === "circle" ? undefined : rad }}
+              style={{
+                borderColor: settings.accent_color,
+                borderRadius: settings.avatar_shape === "circle" ? undefined : rad,
+                filter: settings.monochrome_icons ? "grayscale(1)" : undefined,
+              }}
             />
           ) : (
             <div
@@ -94,7 +153,13 @@ export function ProfileView({
 
         {/* Name */}
         <h1 style={{ fontSize: namePx, lineHeight: 1.1, fontWeight: 700 }}>
-          {settings.typing_effect ? <TypingText text={name} /> : name}
+          {showTypewriter ? (
+            <TypingText text={name} />
+          ) : usernameEffect !== "none" && usernameEffect !== "typewriter" ? (
+            <UsernameText text={name} effect={usernameEffect as "rainbow" | "glitch" | "wave"} />
+          ) : (
+            name
+          )}
         </h1>
         <p className="mt-1 text-sm opacity-60">@{profile.username}</p>
 
@@ -124,6 +189,8 @@ export function ProfileView({
               buttonSize={settings.button_size}
               radius={settings.radius}
               layout={settings.link_layout}
+              hoverEffect={settings.hover_effect}
+              monochrome={settings.monochrome_icons}
             />
           ))}
         </div>

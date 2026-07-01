@@ -10,6 +10,21 @@ export type NameSize = "sm" | "md" | "lg" | "xl";
 export type AvatarShape = "circle" | "square" | "rounded";
 export type LinkLayout = "list" | "grid";
 
+// ── New effect types ──
+export type OverlayType = "none" | "dark" | "light" | "gradient-v" | "gradient-h" | "vignette" | "radial";
+export type NameEffect = "none" | "typewriter" | "rainbow" | "glitch" | "wave" | "gradient";
+export type HoverEffect = "none" | "glow" | "pulse" | "shake" | "lift" | "slide";
+export type CursorEffect = "none" | "spark" | "rainbow" | "trail" | "ripple" | "hearts";
+export type PageEntry = "none" | "fade" | "slide-up" | "zoom" | "blur" | "flip";
+export type BorderGlow = "none" | "glow" | "pulse" | "shake";
+export type CustomFont = "none" | "poppins" | "inter" | "roboto-mono" | "playfair" | "bebas" | "dancing" | "press-start";
+
+// Aliases used across components
+export type PageAnimation = PageEntry;
+export type UsernameEffectType = NameEffect;
+export type CursorEffectType = CursorEffect;
+export type HoverEffectType = HoverEffect;
+
 export interface ProfileEffects {
   particles: ParticleEffect;
   snow: boolean;
@@ -54,6 +69,18 @@ export interface ProfileSettings {
   show_footer: boolean;
   custom_css: string | null;
   template: string;
+  // ── New effect fields ──
+  gradient_overlay: OverlayType;
+  overlay_color1: string | null;
+  overlay_color2: string | null;
+  overlay_intensity: number;
+  border_glow: "none" | "accent" | "rainbow" | "soft" | "pulse" | "shake";
+  page_entry: PageEntry;
+  username_effect: NameEffect;
+  hover_effect: HoverEffect;
+  cursor_effect: CursorEffectType;
+  monochrome_icons: boolean;
+  custom_font: CustomFont;
   updated_at: string;
 }
 

@@ -211,16 +211,128 @@ a {
   background-size: 56px 56px;
 }
 
+/* ============ USERNAME EFFECTS ============ */
+.username-rainbow {
+  background: linear-gradient(90deg, #ff5f6d, #ffc371, #47e891, #38e8ff, #b06aff, #ff5f6d);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow-slide 3s linear infinite;
+}
+@keyframes rainbow-slide {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.username-glitch {
+  position: relative;
+  animation: glitch-shake 2.5s infinite;
+}
+@keyframes glitch-shake {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.username-wave {
+  display: inline-block;
+  animation: username-wave 2s ease-in-out infinite;
+}
+@keyframes username-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.username-gradient {
+  background: var(--name-gradient, linear-gradient(135deg, var(--accent), #fff));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.username-glow {
+  text-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent), 0 0 24px var(--accent);
+}
+
+/* ============ HOVER EFFECTS ============ */
+.hover-glow:hover {
+  box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+}
+.hover-pulse:hover {
+  animation: hover-pulse 0.6s ease-in-out;
+}
+@keyframes hover-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.hover-shake:hover {
+  animation: hover-shake 0.4s ease-in-out;
+}
+@keyframes hover-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* ============ PAGE ENTRY ANIMATION ============ */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes page-slide-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes page-zoom-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes page-blur-in {
+  from { opacity: 0; filter: blur(12px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* ============ BORDER GLOW ============ */
+.border-glow {
+  box-shadow: 0 0 12px var(--accent), inset 0 0 12px var(--accent);
+}
+.border-glow-hover:hover {
+  box-shadow: 0 0 16px var(--accent), inset 0 0 8px var(--accent);
+}
+
+/* ============ ANIMATE-FADE-IN (used by profile) ============ */
+@keyframes animate-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: animate-fade-in 0.6s ease-out;
+}
+
+/* Stagger helper */
+.stagger > * { opacity: 0; animation: animate-fade-in 0.5s ease-out forwards; }
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.15s; }
+.stagger > *:nth-child(3) { animation-delay: 0.25s; }
+.stagger > *:nth-child(4) { animation-delay: 0.35s; }
+.stagger > *:nth-child(5) { animation-delay: 0.45s; }
+.stagger > *:nth-child(6) { animation-delay: 0.55s; }
+.stagger > *:nth-child(7) { animation-delay: 0.65s; }
+.stagger > *:nth-child(8) { animation-delay: 0.75s; }
+.stagger > *:nth-child(n+9) { animation-delay: 0.85s; }
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal, .animate-fade-in, .stagger > * {
     opacity: 1;
     transform: none;
+    animation: none !important;
     transition: none;
   }
-  .breathe,
-  .badge-float,
-  .badge-glow,
-  .badge-shine::after {
-    animation: none;
+  .breathe, .badge-float, .badge-glow, .badge-shine::after,
+  .username-rainbow, .username-wave, .username-glitch {
+    animation: none !important;
   }
 }

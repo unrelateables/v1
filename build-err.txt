@@ -1,4 +1,8 @@
-﻿  ▲ Next.js 14.2.15
+﻿
+> biolink@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.15
 
    Creating an optimized production build ...
  ✓ Compiled successfully
@@ -11,41 +15,22 @@
 90:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
-   Collecting page data ...
-   Generating static pages (0/18) ...
-   Generating static pages (4/18) 
-   Generating static pages (8/18) 
-   Generating static pages (13/18) 
- ✓ Generating static pages (18/18)
-   Finalizing page optimization ...
-   Collecting build traces ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
 
-Route (app)                              Size     First Load JS
-┌ ƒ /                                    874 B          94.9 kB
-├ ○ /_not-found                          141 B          87.3 kB
-├ ƒ /[username]                          5.16 kB        92.3 kB
-├ ƒ /admin                               182 B          94.2 kB
-├ ƒ /api/clicks                          0 B                0 B
-├ ƒ /api/views                           0 B                0 B
-├ ƒ /auth/callback                       0 B                0 B
-├ ƒ /dashboard                           182 B          94.2 kB
-├ ƒ /dashboard/appearance                141 B          87.3 kB
-├ ƒ /dashboard/editor                    7.9 kB         95.1 kB
-├ ƒ /dashboard/embeds                    1.75 kB        88.9 kB
-├ ƒ /dashboard/links                     16.9 kB         104 kB
-├ ƒ /dashboard/profile                   2.07 kB         154 kB
-├ ƒ /dashboard/settings                  1.21 kB         153 kB
-├ ƒ /leaderboard                         182 B          94.2 kB
-├ ƒ /login                               1.52 kB        95.5 kB
-└ ƒ /signup                              1.52 kB        95.5 kB
-+ First Load JS shared by all            87.2 kB
-  ├ chunks/117-071f6f11c6421381.js       31.6 kB
-  ├ chunks/fd9d1056-02e6c18dfb8fc19a.js  53.6 kB
-  └ other shared chunks (total)          1.95 kB
+./components/profile/profile-view.tsx:27:31
+Type error: Cannot find name 'PageEntry'.
 
-
-ƒ Middleware                             82.3 kB
-
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
-
+[0m [90m 25 |[39m } [36mfrom[39m [32m"@/lib/types"[39m[33m;[39m[0m
+[0m [90m 26 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 27 |[39m [36mconst[39m [33mPAGE_ANIM_CLASS[39m[33m:[39m 
+[33mRecord[39m[33m<[39m[33mPageEntry[39m[33m,[39m string[33m>[39m [33m=[39m {[0m
+[0m [90m    |[39m                               [31m[1m^[22m[39m[0m
+[0m [90m 28 |[39m   none[33m:[39m [32m""[39m[33m,[39m[0m
+[0m [90m 29 |[39m   fade[33m:[39m [32m"animate-fade-in"[39m[33m,[39m[0m
+[0m [90m 30 |[39m   [32m"slide-up"[39m[33m:[39m [32m"animate-slide-in"[39m[33m,[39m[0m

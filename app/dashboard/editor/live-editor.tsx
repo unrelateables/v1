@@ -5,8 +5,8 @@ import { ProfilePreview } from "./profile-preview";
 import { Controls } from "./controls";
 import { saveEditorAction } from "./actions";
 import { Button } from "@/components/ui";
-import { TEMPLATES, getTemplate } from "@/lib/templates";
-import type { Profile, ProfileSettings, Link, Embed, ProfilePage } from "@/lib/types";
+import { getTemplate } from "@/lib/templates";
+import type { Profile, ProfileSettings, Link, Embed } from "@/lib/types";
 
 export type EditorState = ProfileSettings;
 
@@ -26,7 +26,7 @@ export function LiveEditor({
   const [saved, setSaved] = useState(false);
 
   function patch(p: Partial<EditorState>) {
-    setState((prev) => ({ ...prev, ...p }));
+    setState((prev) => ({ ...prev, ...p, template: "custom" }));
   }
 
   function applyTemplate(id: string) {
@@ -77,41 +77,12 @@ export function LiveEditor({
 
       {/* Controls */}
       <div className="order-2 w-full lg:order-1 lg:w-[48%] lg:pr-4">
-        {/* Template picker */}
-        <div className="mb-6">
-          <h3 className="mb-3 font-mono text-xs text-neutral-500">
-            {"// templates"}
-          </h3>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {TEMPLATES.map((t) => {
-              const active = state.template === t.id;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => applyTemplate(t.id)}
-                  className={`flex flex-col items-center gap-1.5 rounded-2xl border p-3 transition ${
-                    active
-                      ? "border-white/30 bg-white/10"
-                      : "border-white/10 bg-white/[0.02] hover:bg-white/5"
-                  }`}
-                >
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white"
-                    style={{
-                      background: `linear-gradient(135deg, ${t.apply.accent_color}, ${t.apply.text_color})`,
-                    }}
-                  >
-                    {t.name.charAt(0)}
-                  </span>
-                  <span className="text-[10px] text-neutral-400">{t.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <Controls state={state} patch={patch} />
+        <Controls
+          state={state}
+          patch={patch}
+          activeTemplate={state.template}
+          onTemplate={applyTemplate}
+        />
 
         {/* Save */}
         <div className="mt-8 flex items-center gap-3">

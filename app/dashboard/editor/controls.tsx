@@ -2,6 +2,7 @@
 
 import { clsx } from "@/lib/utils";
 import { MusicPicker } from "./music-picker";
+import { TEMPLATES } from "@/lib/templates";
 import type {
   BgType,
   Layout,
@@ -234,16 +235,49 @@ export const LINK_LAYOUT_OPTIONS: { value: LinkLayout; label: string }[] = [
 export function Controls({
   state,
   patch,
+  activeTemplate,
+  onTemplate,
 }: {
   state: ProfileSettings;
   patch: (p: Partial<ProfileSettings>) => void;
+  activeTemplate: string;
+  onTemplate: (id: string) => void;
 }) {
   return (
     <div className="space-y-4">
-      {/* Background */}
-      <Section title="background">
+      {/* Theme + background fused */}
+      <Section title="theme & background">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-wide text-neutral-500">
+          Quick themes
+        </p>
+        <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {TEMPLATES.map((t) => {
+            const active = activeTemplate === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => onTemplate(t.id)}
+                className={clsx(
+                  "flex flex-col items-center gap-1 rounded-2xl border p-2.5 transition",
+                  active
+                    ? "border-white/30 bg-white/10"
+                    : "border-white/10 bg-white/[0.02] hover:bg-white/5"
+                )}
+                title={t.description}
+              >
+                <span
+                  className="h-7 w-7 rounded-full"
+                  style={{ background: t.swatch }}
+                />
+                <span className="text-[9px] text-neutral-400">{t.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <PillSelect
-          label="Type"
+          label="Background type"
           value={state.bg_type}
           options={BG_TYPES}
           onChange={(v) => patch({ bg_type: v })}
@@ -252,7 +286,7 @@ export function Controls({
           <p className="mb-2 font-mono text-[11px] uppercase tracking-wide text-neutral-500">
             {state.bg_type === "gradient"
               ? "Gradient CSS"
-              : state.bg_type === "image" || state.bg_type === "video"
+              : state.bg_type === "image" || state.bg_type === "video" || state.bg_type === "gif"
               ? "URL"
               : "Color"}
           </p>

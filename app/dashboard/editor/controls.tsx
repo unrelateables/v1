@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MusicPicker } from "./music-picker";
 import { TEMPLATES } from "@/lib/templates";
 import { uploadBackgroundAction } from "./actions";
@@ -18,38 +18,119 @@ import type {
   ProfileSettings,
 } from "@/lib/types";
 
-/* Background file uploader (image / gif / video) */
+interface FFmpegLike {
+  load(opts: { coreURL: string; wasmURL: string }): Promise<void>;
+  writeFile(name: string, data: Uint8Array): Promise<void>;
+  exec(args: string[]): Promise<void>;
+  readFile(name: string): Promise<Uint8Array | string>;
+}
+
+/* Background file uploader (image / gif / video)
+   GIFs are auto-converted to crisp WebM video in-browser for HD quality. */
 function BgUploader({
   bgType,
   onUploaded,
 }: {
   bgType: BgType;
-  onUploaded: (url: string) => void;
+  onUploaded: (url: string, type: "image" | "video") => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function loadFFmpegWASM(): Promise<{ FFmpeg: new () => FFmpegLike } | undefined> {
+    const w = window as unknown as { FFmpegWASM?: { FFmpeg: new () => FFmpegLike }; __ffmpegLoading?: Promise<void> };
+    if (w.FFmpegWASM) return w.FFmpegWASM;
+
+    if (!w.__ffmpegLoading) {
+      w.__ffmpegLoading = new Promise<void>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js";
+        script.crossOrigin = "anonymous";
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load ffmpeg"));
+        document.head.appendChild(script);
+      });
+    }
+    try {
+      await w.__ffmpegLoading;
+    } catch {
+      return undefined;
+    }
+    return w.FFmpegWASM;
+  }
+
+  async function convertGifToWebM(file: File): Promise<File | null> {
+    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    const FFmpegWASM = await loadFFmpegWASM();
+    if (!FFmpegWASM) throw new Error("ffmpeg not available");
+
+    const ffmpeg = new FFmpegWASM.FFmpeg();
+    await ffmpeg.load({
+      coreURL: `${baseURL}/ffmpeg-core.js`,
+      wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+    });
+
+    const buf = await file.arrayBuffer();
+    await ffmpeg.writeFile("input.gif", new Uint8Array(buf));
+    await ffmpeg.exec([
+      "-i", "input.gif",
+      "-c:v", "libvpx-vp9",
+      "-b:v", "0",
+      "-crf", "35",
+      "-row-mt", "1",
+      "output.webm",
+    ]);
+    const data = (await ffmpeg.readFile("output.webm")) as Uint8Array;
+    return new File([new Blob([data as BlobPart])], "converted.webm", { type: "video/webm" });
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setError(null);
+    setUploading(false);
+
+    // Auto-convert GIFs to crisp WebM video for HD quality
+    let uploadFile = file;
+    let fileType: "image" | "video" = bgType === "video" ? "video" : "image";
+
+    if (file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif")) {
+      try {
+        setConverting(true);
+        const converted = await convertGifToWebM(file);
+        setConverting(false);
+        if (converted) {
+          uploadFile = converted;
+          fileType = "video";
+        }
+      } catch {
+        setConverting(false);
+        // If conversion fails, fall back to uploading the raw GIF
+      }
+    }
+
     setUploading(true);
     const fd = new FormData();
-    fd.set("file", file);
+    fd.set("file", uploadFile);
     const result = await uploadBackgroundAction(fd);
     setUploading(false);
     if (result?.error) {
       setError(result.error);
       return;
     }
-    if (result?.url) onUploaded(result.url);
+    if (result?.url) {
+      onUploaded(result.url, result.type === "video" ? "video" : "image");
+    }
   }
+
+  const busy = uploading || converting;
 
   return (
     <div>
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-dashed border-white/15 bg-white/[0.02] px-4 py-2 text-xs text-neutral-400 transition hover:bg-white/5">
-        {uploading ? (
-          <span>Uploading...</span>
+        {busy ? (
+          <span>{converting ? "Converting GIF to HD video..." : "Uploading..."}</span>
         ) : (
           <>
             <span>📁</span>
@@ -60,7 +141,7 @@ function BgUploader({
           type="file"
           className="hidden"
           onChange={handleFile}
-          disabled={uploading}
+          disabled={busy}
           accept={
             bgType === "video"
               ? "video/*"
@@ -342,7 +423,9 @@ export function Controls({
         {(state.bg_type === "image" || state.bg_type === "gif" || state.bg_type === "video") && (
           <BgUploader
             bgType={state.bg_type}
-            onUploaded={(url) => patch({ bg_value: url })}
+            onUploaded={(url, type) => {
+              patch({ bg_value: url, bg_type: type === "video" ? "video" : "image" });
+            }}
           />
         )}
         <div>

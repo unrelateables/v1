@@ -40,14 +40,33 @@ export function BackgroundLayer({
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
       {isImgBg && bgValue ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={bgValue}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "center" }}
-        />
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={bgValue}
+            alt=""
+            aria-hidden
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{
+              objectPosition: "center",
+              imageRendering: "auto",
+              // slight upscale smoothing for GIFs (256-color dithering)
+              filter: bgType === "gif" ? "saturate(1.05)" : undefined,
+            }}
+          />
+          {/* Subtle CSS upscale layer — sharpens edges on low-res GIFs */}
+          {bgType === "gif" && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={bgValue}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover opacity-0"
+              style={{ objectPosition: "center", transform: "scale(1.01)" }}
+            />
+          )}
+        </>
       ) : bgType === "video" && bgValue ? (
         <video
           autoPlay

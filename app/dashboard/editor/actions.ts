@@ -85,6 +85,42 @@ export async function uploadAudioAction(formData: FormData) {
   return { url: `${data.publicUrl}?t=${Date.now()}` };
 }
 
+/** Upload a background image/gif/video to storage and return the public URL. */
+export async function uploadBackgroundAction(formData: FormData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const file = formData.get("file") as File | null;
+  if (!file) return { error: "No file selected." };
+
+  const sizeMB = file.size / (1024 * 1024);
+  if (sizeMB > 50) return { error: "Background file must be under 50MB." };
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const isImage = ["jpg", "jpeg", "png", "gif", "webp", "avif"].includes(ext);
+  const isVideo = ["mp4", "webm", "mov", "ogv"].includes(ext);
+  if (!isImage && !isVideo) {
+    return { error: "Use an image (jpg, png, gif, webp) or video (mp4, webm)." };
+  }
+
+  const bucket = isImage ? "avatars" : "avatars";
+  const folder = isImage ? "bg" : "bgvideo";
+  const path = `${user.id}/${folder}.${ext}`;
+
+  const { error: upErr } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (upErr) return { error: upErr.message };
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  const url = `${data.publicUrl}?t=${Date.now()}`;
+  return { url, type: isVideo ? "video" : ext === "gif" ? "gif" : "image" };
+}
+
 export async function applyTemplateAction(templateId: string) {
   const supabase = createClient();
   const {

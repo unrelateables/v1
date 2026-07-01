@@ -1,8 +1,10 @@
 "use client";
 
 import { clsx } from "@/lib/utils";
+import { useState } from "react";
 import { MusicPicker } from "./music-picker";
 import { TEMPLATES } from "@/lib/templates";
+import { uploadBackgroundAction } from "./actions";
 import type {
   BgType,
   Layout,
@@ -15,6 +17,61 @@ import type {
   LinkLayout,
   ProfileSettings,
 } from "@/lib/types";
+
+/* Background file uploader (image / gif / video) */
+function BgUploader({
+  bgType,
+  onUploaded,
+}: {
+  bgType: BgType;
+  onUploaded: (url: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    const fd = new FormData();
+    fd.set("file", file);
+    const result = await uploadBackgroundAction(fd);
+    setUploading(false);
+    if (result?.error) {
+      setError(result.error);
+      return;
+    }
+    if (result?.url) onUploaded(result.url);
+  }
+
+  return (
+    <div>
+      <label className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-dashed border-white/15 bg-white/[0.02] px-4 py-2 text-xs text-neutral-400 transition hover:bg-white/5">
+        {uploading ? (
+          <span>Uploading...</span>
+        ) : (
+          <>
+            <span>📁</span>
+            <span>Upload {bgType === "video" ? "video" : "file"}</span>
+          </>
+        )}
+        <input
+          type="file"
+          className="hidden"
+          onChange={handleFile}
+          disabled={uploading}
+          accept={
+            bgType === "video"
+              ? "video/*"
+              : "image/gif,image/png,image/jpeg,image/webp,image/*"
+          }
+        />
+      </label>
+      {error && <p className="mt-1.5 text-[11px] text-red-400">{error}</p>}
+    </div>
+  );
+}
 
 /* Reusable pill selector (no <select> dropdowns) */
 export function PillSelect<T extends string>({
@@ -282,6 +339,12 @@ export function Controls({
           options={BG_TYPES}
           onChange={(v) => patch({ bg_type: v })}
         />
+        {(state.bg_type === "image" || state.bg_type === "gif" || state.bg_type === "video") && (
+          <BgUploader
+            bgType={state.bg_type}
+            onUploaded={(url) => patch({ bg_value: url })}
+          />
+        )}
         <div>
           <p className="mb-2 font-mono text-[11px] uppercase tracking-wide text-neutral-500">
             {state.bg_type === "gradient"

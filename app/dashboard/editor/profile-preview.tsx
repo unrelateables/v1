@@ -16,7 +16,6 @@ export function ProfilePreview({
 }) {
   const s = settings;
 
-  const bg = getBgStyle(s.bg_type, s.bg_value, s.accent_color);
   const isLeft = s.layout === "left" || s.text_align === "left";
   const alignClass = isLeft ? "items-start text-left" : "items-center text-center";
   const isGrid = s.link_layout === "grid";
@@ -28,11 +27,39 @@ export function ProfilePreview({
 
   const name = profile.display_name || profile.username;
 
+  const isMediaBg = s.bg_type === "image" || s.bg_type === "gif" || s.bg_type === "video";
+  const bgColor =
+    s.bg_type === "solid"
+      ? s.bg_value || "#0a0a0a"
+      : s.bg_type === "gradient"
+      ? s.bg_value || `linear-gradient(135deg, ${s.accent_color}, #0a0a0a)`
+      : "#0a0a0a";
+
   return (
     <div
       className="relative flex min-h-full flex-col items-center justify-start overflow-y-auto px-5 py-10"
-      style={{ ...bg, color: s.text_color }}
+      style={{ background: bgColor, color: s.text_color }}
     >
+      {/* Full-cover background media */}
+      {isMediaBg && s.bg_value && (
+        // eslint-disable-next-line @next/next/no-img-element
+        s.bg_type === "video" ? (
+          <video
+            src={s.bg_value}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <img
+            src={s.bg_value}
+            alt=""
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+        )
+      )}
       <div className="pointer-events-none absolute inset-0" style={{ background: `rgba(0,0,0,${overlay})` }} />
 
       <div
@@ -99,15 +126,6 @@ export function ProfilePreview({
       </div>
     </div>
   );
-}
-
-function getBgStyle(type: string, value: string | null, accent: string): React.CSSProperties {
-  if (type === "solid") return { background: value || "#0a0a0a" };
-  if (type === "gradient")
-    return { background: value || `linear-gradient(135deg, ${accent}, #0a0a0a)` };
-  if (type === "image" && value)
-    return { backgroundImage: `url(${value})`, backgroundSize: "cover", backgroundPosition: "center" };
-  return { background: "#0a0a0a" };
 }
 
 function buttonStyle(style: string, accent: string): React.CSSProperties {

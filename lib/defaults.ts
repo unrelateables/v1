@@ -38,6 +38,7 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   cursor_effect: "none",
   monochrome_icons: false,
   custom_font: "none",
+  social_links: [],
 };
 
 /** Merge raw DB row with safe defaults. Never returns undefined fields. */

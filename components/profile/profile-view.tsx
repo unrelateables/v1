@@ -11,6 +11,7 @@ import { EmbedBlock } from "./embed-block";
 import { BadgeChips } from "./badge-chips";
 import { CursorEffect as CursorEffectLayer } from "./cursor-effect";
 import { UsernameText } from "./username-effects";
+import { SocialIcons } from "./social-icons";
 import {
   FONT_STACKS,
   RADIUS,
@@ -40,7 +41,7 @@ export function ProfileView({
   page: ProfilePage;
   badges?: string[];
 }) {
-  const { profile, settings, links, embeds } = page;
+  const { profile, settings, links, embeds, socialLinks = [] } = page;
   const [audioOn, setAudioOn] = useState(settings.audio_autoplay);
   const trackedRef = useRef(false);
 
@@ -170,6 +171,13 @@ export function ProfileView({
           <p className="mt-4 max-w-md text-sm leading-relaxed opacity-80">
             {profile.bio}
           </p>
+        )}
+
+        {/* Social icons */}
+        {socialLinks.length > 0 && (
+          <div className="mt-5">
+            <SocialIcons links={socialLinks} accent={settings.accent_color} />
+          </div>
         )}
 
         {/* Links */}

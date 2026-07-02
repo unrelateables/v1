@@ -81,6 +81,7 @@ export interface ProfileSettings {
   cursor_effect: CursorEffectType;
   monochrome_icons: boolean;
   custom_font: CustomFont;
+  social_links: SocialLink[];
   updated_at: string;
 }
 
@@ -103,9 +104,15 @@ export interface Embed {
   created_at: string;
 }
 
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 export interface ProfilePage {
   profile: Profile;
   settings: ProfileSettings;
   links: Link[];
   embeds: Embed[];
+  socialLinks?: SocialLink[];
 }

@@ -153,11 +153,16 @@ export default async function UsernamePage({
     .eq("profile_id", profile.id)
     .order("position");
 
+  const socialLinks = Array.isArray(settings.social_links)
+    ? settings.social_links
+    : [];
+
   const page: ProfilePage = {
     profile,
     settings,
     links: links ?? [],
     embeds: embeds ?? [],
+    socialLinks,
   };
 
   const badges = getProfileBadges(profile);

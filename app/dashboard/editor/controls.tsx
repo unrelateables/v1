@@ -3,6 +3,7 @@
 import { clsx } from "@/lib/utils";
 import { useState, useRef } from "react";
 import { MusicPicker } from "./music-picker";
+import { SocialLinksEditor } from "./social-links-editor";
 import { TEMPLATES } from "@/lib/templates";
 import { uploadBackgroundAction } from "./actions";
 import type {
@@ -468,6 +469,14 @@ export function Controls({
           min={0}
           max={100}
           onChange={(v) => patch({ bg_overlay: v })}
+        />
+      </Section>
+
+      {/* Social Links */}
+      <Section title="social links">
+        <SocialLinksEditor
+          value={state.social_links ?? []}
+          onChange={(v) => patch({ social_links: v })}
         />
       </Section>
 

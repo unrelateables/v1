@@ -39,6 +39,7 @@ export async function saveEditorAction(settings: ProfileSettings) {
       typing_effect: payload.typing_effect,
       is_public: payload.is_public,
       effects: payload.effects,
+      social_links: payload.social_links,
     };
     const { error: err2 } = await supabase
       .from("profile_settings")

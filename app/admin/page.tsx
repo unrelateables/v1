@@ -10,8 +10,26 @@ import {
   grantBadgeAction,
 } from "./actions";
 import { BADGES } from "@/lib/constants";
-import { getProfileBadges } from "@/lib/badges";
 import { DeleteButton } from "./delete-button";
+
+/** Safely compute badges without crashing on bad data */
+function safeBadges(p: any): string[] {
+  try {
+    return getProfileBadgesSafe(p);
+  } catch {
+    return [];
+  }
+}
+
+function getProfileBadgesSafe(p: any): string[] {
+  if (!p) return [];
+  const badges: string[] = [];
+  if (p.role === "admin") {
+    badges.push("owner");
+    badges.push("staff");
+  }
+  return badges;
+}
 
 export default async function AdminPage() {
   const supabase = createClient();
@@ -78,7 +96,7 @@ export default async function AdminPage() {
           <h2 className="mb-3 text-sm font-medium">Users ({profiles?.length ?? 0})</h2>
           <div className="space-y-2">
             {profiles?.map((p) => {
-              const earnedBadges = getProfileBadges(p);
+              const earnedBadges = getProfileBadgesSafe(p);
               return (
                 <div
                   key={p.id}

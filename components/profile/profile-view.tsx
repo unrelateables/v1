@@ -37,9 +37,11 @@ const PAGE_ANIM_CLASS: Record<PageEntry, string> = {
 export function ProfileView({
   page,
   badges = [],
+  badgeCounts = {},
 }: {
   page: ProfilePage;
   badges?: string[];
+  badgeCounts?: Record<string, number>;
 }) {
   const { profile, settings, links, embeds, socialLinks = [] } = page;
   const [audioOn, setAudioOn] = useState(settings.audio_autoplay);
@@ -162,7 +164,7 @@ export function ProfileView({
                 name
               )}
             </h1>
-            {badges.length > 0 && <BadgeChips badges={badges} />}
+            {badges.length > 0 && <BadgeChips badges={badges} counts={badgeCounts} />}
           </div>
 
           <p className="mt-1 text-sm font-medium opacity-50">@{profile.username}</p>

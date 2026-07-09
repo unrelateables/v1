@@ -1,7 +1,13 @@
 import { getBadge, RARITY_INFO } from "@/lib/constants";
 import type { BadgeDef, Rarity } from "@/lib/constants";
 
-export function BadgeChips({ badges }: { badges: string[] }) {
+export function BadgeChips({
+  badges,
+  counts,
+}: {
+  badges: string[];
+  counts?: Record<string, number>;
+}) {
   if (!badges.length) return null;
 
   return (
@@ -9,14 +15,20 @@ export function BadgeChips({ badges }: { badges: string[] }) {
       {badges.map((id) => {
         const def = getBadge(id);
         if (!def) return null;
-        return <BadgeIcon key={id} def={def} />;
+        return <BadgeIcon key={id} def={def} count={counts?.[id]} />;
       })}
     </div>
   );
 }
 
 /* guns.lol-style: small icon badges with ore-style rarity border + glow */
-function BadgeIcon({ def }: { def: BadgeDef }) {
+function BadgeIcon({
+  def,
+  count,
+}: {
+  def: BadgeDef;
+  count?: number;
+}) {
   const rarity = RARITY_INFO[def.rarity as Rarity];
 
   return (
@@ -58,11 +70,13 @@ function BadgeIcon({ def }: { def: BadgeDef }) {
             {def.description}
           </span>
         )}
-        {/* rarity count */}
-        <span className="mt-1.5 block text-[9px] text-neutral-600">
-          <span style={{ color: rarity.color }}>{def.count.toLocaleString()}</span>
-          {" "}in existence
-        </span>
+        {/* rarity count — dynamic from DB */}
+        {count !== undefined && (
+          <span className="mt-1.5 block text-[9px] text-neutral-600">
+            <span style={{ color: rarity.color }}>{count.toLocaleString()}</span>
+            {" "}in existence
+          </span>
+        )}
       </span>
     </div>
   );

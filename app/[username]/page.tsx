@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Metadata } from "next";
 import { ProfileView } from "@/components/profile/profile-view";
 import type { ProfilePage } from "@/lib/types";
-import { getProfileBadges } from "@/lib/badges";
+import { getProfileBadges, getBadgeCounts } from "@/lib/badges";
 import { safeSettings } from "@/lib/defaults";
 
 const SITE_URL =

@@ -1,56 +1,38 @@
 import { getBadge } from "@/lib/constants";
-import { clsx } from "@/lib/utils";
 import type { BadgeDef } from "@/lib/constants";
 
 export function BadgeChips({ badges }: { badges: string[] }) {
   if (!badges.length) return null;
 
   return (
-    <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+    <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
       {badges.map((id) => {
         const def = getBadge(id);
         if (!def) return null;
-        return <BadgeTile key={id} def={def} />;
+        return <BadgePill key={id} def={def} />;
       })}
     </div>
   );
 }
 
-function BadgeTile({ def }: { def: BadgeDef }) {
+function BadgePill({ def }: { def: BadgeDef }) {
   return (
-    <div className="group relative">
-      <div
-        title={def.label}
-        className={clsx(
-          "relative flex h-9 w-9 items-center justify-center rounded-xl text-base transition-transform duration-200 hover:scale-110 hover:-translate-y-0.5",
-          def.rare && "holo-ring badge-float"
-        )}
-        style={{
-          background: `linear-gradient(135deg, ${def.gradient[0]}, ${def.gradient[1]})`,
-          boxShadow: `0 4px 12px -2px ${def.color}77, inset 0 1px 0 rgba(255,255,255,0.4)`,
-        }}
-      >
-        <span
-          className="badge-shine flex h-full w-full items-center justify-center overflow-hidden rounded-xl"
-          aria-hidden
-        >
-          {def.emoji}
-        </span>
-        {def.rare && (
-          <span
-            className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]"
-            title="Rare"
-          />
-        )}
-      </div>
-
-      {/* Label tooltip on hover */}
-      <span
-        className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-black/90 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 backdrop-blur transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100"
-        style={{ color: def.color }}
-      >
-        {def.label}
-      </span>
-    </div>
+    <span
+      title={def.label}
+      className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide transition-transform duration-150 hover:scale-105"
+      style={{
+        color: def.color,
+        background: `${def.color}14`,
+        border: `1px solid ${def.color}40`,
+        boxShadow: `0 0 8px -2px ${def.color}50`,
+      }}
+    >
+      <svg viewBox="0 0 24 24" className="h-3 w-3 fill-current">
+        {def.id === "owner" && <path d="M5 16L3 8l5.5 4L12 5l3.5 7L21 8l-2 8H5z" />}
+        {def.id === "verified" && <path d="M9 12l2 2 4-4M12 2l2.5 2.5L18 4l-.5 3.5L20 9l-2.5 2.5L18 15l-3.5-.5L12 22l-2.5-7.5L6 15l.5-3.5L4 9l2.5-2.5L6 3l3.5.5L12 1z" />}
+        {def.id === "early" && <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />}
+      </svg>
+      {def.label}
+    </span>
   );
 }

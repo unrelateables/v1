@@ -40,6 +40,7 @@ export interface Profile {
   role: "user" | "admin";
   banned: boolean;
   badges: string[];
+  equipped_badges: string[] | null;
   created_at: string;
 }
 

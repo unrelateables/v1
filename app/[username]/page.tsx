@@ -165,6 +165,13 @@ export default async function UsernamePage({
     socialLinks,
   };
 
-  const badges = getProfileBadges(profile);
-  return <ProfileView page={page} badges={badges} />;
+  const earnedBadges = getProfileBadges(profile);
+  const equipped = Array.isArray(profile.equipped_badges)
+    ? profile.equipped_badges
+    : [];
+  const badges = equipped.length > 0
+    ? equipped.filter((b: string) => earnedBadges.includes(b))
+    : earnedBadges;
+  const badgeCounts = await getBadgeCounts();
+  return <ProfileView page={page} badges={badges} badgeCounts={badgeCounts} />;
 }

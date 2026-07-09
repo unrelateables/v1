@@ -41,6 +41,16 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   social_links: [],
 };
 
+/** Safe defaults for a profile row (in case columns are missing). */
+export function safeProfile(raw: any): any {
+  return {
+    ...raw,
+    badges: raw?.badges ?? [],
+    role: raw?.role ?? "user",
+    equipped_badges: raw?.equipped_badges ?? null,
+  };
+}
+
 /** Merge raw DB row with safe defaults. Never returns undefined fields. */
 export function safeSettings(raw: any): ProfileSettings {
   return {
@@ -52,9 +62,4 @@ export function safeSettings(raw: any): ProfileSettings {
       ...(raw?.effects ?? {}),
     },
   } as ProfileSettings;
-}
-
-/** Safe defaults for a profile row (in case `badges` column is missing). */
-export function safeProfile(raw: any): any {
-  return { ...raw, badges: raw?.badges ?? [], role: raw?.role ?? "user" };
 }

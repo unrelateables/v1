@@ -165,13 +165,18 @@ export default async function UsernamePage({
     socialLinks,
   };
 
-  const earnedBadges = getProfileBadges(profile);
+  // Badges: merge auto-earned (role/date) with admin-granted (badges column)
+  const autoBadges = getProfileBadges(profile);
+  const dbBadges = Array.isArray(profile.badges) ? profile.badges : [];
+  const allEarned = Array.from(new Set([...autoBadges, ...dbBadges]));
+
+  // Then filter by equipped (if equipped_badges exists)
   const equipped = Array.isArray(profile.equipped_badges)
     ? profile.equipped_badges
     : [];
   const badges = equipped.length > 0
-    ? equipped.filter((b: string) => earnedBadges.includes(b))
-    : earnedBadges;
+    ? equipped.filter((b: string) => allEarned.includes(b))
+    : allEarned;
   const badgeCounts = await getBadgeCounts();
   return <ProfileView page={page} badges={badges} badgeCounts={badgeCounts} />;
 }

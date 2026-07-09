@@ -166,20 +166,8 @@ export default async function AdminPage() {
                           {p.role === "admin" ? "Demote" : "Make Admin"}
                         </button>
                       </form>
-                      {/* Delete */}
-                      <form
-                        action={deleteProfileAction}
-                        onSubmit={(e) => {
-                          if (!confirm(`Permanently delete @${p.username}? This cannot be undone.`)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <input type="hidden" name="id" value={p.id} />
-                        <button className="rounded-lg bg-red-900/30 px-3 py-1.5 text-xs text-red-500 hover:bg-red-900/50">
-                          Delete
-                        </button>
-                      </form>
+                      {/* Delete (client component for confirm dialog) */}
+                      <DeleteButton id={p.id} username={p.username} />
                     </div>
                   </div>
 

@@ -90,21 +90,21 @@ export const BADGES: BadgeDef[] = [
     label: "Owner",
     description: "The person who owns and runs this platform. Cannot be earned.",
     rarity: "diamond",
-    icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z",
+    icon: "M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 3h14v2H5v-2z",
   },
   {
     id: "staff",
     label: "Staff",
     description: "A verified staff member trusted to moderate the platform.",
     rarity: "gold",
-    icon: "M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01z M9.5 12.5l1.5 1.5 3-3",
+    icon: "M12 1l2.39 4.84L19.5 6.6l-3.75 3.66.89 5.16L12 12.98l-4.64 2.44.89-5.16L4.5 6.6l5.11-.76L12 1zM10.06 13.41L8.47 15l-3.06-3.06.71-.71L8.94 13l1.12-1.12.71.71zm4.95-1.41l-.71.71L16 14.41l-1.06 1.06-2.29-2.29.71-.71.71.71.95-.95z M10.7 12.7l-1.41-1.41L8 12.59l1.41 1.41L10.7 12.7zm5.59-1.41L18 13l-1.41 1.41L15 12.7l1.29-1.41z M9 12l2 2 4-4-1.5-1.5L11 11l-.5-.5L9 12z",
   },
   {
     id: "early",
     label: "Early Supporter",
     description: "Joined the platform during its very first month.",
     rarity: "emerald",
-    icon: "M13 2L3 14h7l-1 8 10-12h-7z",
+    icon: "M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z",
   },
 ];
 

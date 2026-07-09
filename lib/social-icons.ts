@@ -8,6 +8,10 @@ export interface SocialPlatform {
   /** SVG path data (24x24 viewBox). */
   path: string;
   category: "social" | "gaming" | "crypto";
+  /** Allowed domains for URL validation. Empty/undefined = accept any URL. */
+  urlPattern?: string[];
+  /** Placeholder for the URL input. */
+  placeholder?: string;
 }
 
 export const SOCIAL_PLATFORMS: SocialPlatform[] = [

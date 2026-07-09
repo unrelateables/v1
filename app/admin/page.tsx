@@ -24,9 +24,15 @@ function safeBadges(p: any): string[] {
 function getProfileBadgesSafe(p: any): string[] {
   if (!p) return [];
   const badges: string[] = [];
+  // Role-based
   if (p.role === "admin") {
     badges.push("owner");
     badges.push("staff");
+  }
+  // Manually granted badges (from DB badges column)
+  const dbBadges: string[] = Array.isArray(p.badges) ? p.badges : [];
+  for (const b of dbBadges) {
+    if (!badges.includes(b)) badges.push(b);
   }
   return badges;
 }

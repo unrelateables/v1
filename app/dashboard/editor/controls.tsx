@@ -6,6 +6,7 @@ import { MusicPicker } from "./music-picker";
 import { SocialLinksEditor } from "./social-links-editor";
 import { TEMPLATES } from "@/lib/templates";
 import { uploadBackgroundAction } from "./actions";
+import { Label, Input } from "@/components/ui";
 import type {
   BgType,
   Layout,
@@ -717,6 +718,42 @@ export function Controls({
           checked={state.is_public}
           onChange={(v) => patch({ is_public: v })}
         />
+        <Toggle
+          label="Spinning avatar"
+          checked={state.spin_avatar}
+          onChange={(v) => patch({ spin_avatar: v })}
+        />
+        <Toggle
+          label="Show profile age"
+          checked={state.show_profile_age}
+          onChange={(v) => patch({ show_profile_age: v })}
+        />
+      </Section>
+
+      {/* Integrations */}
+      <Section title="integrations">
+        <Label>Discord User ID</Label>
+        <input
+          type="text"
+          value={state.discord_id ?? ""}
+          onChange={(e) => patch({ discord_id: e.target.value || null })}
+          placeholder="e.g. 123456789012345678"
+          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
+        />
+        <p className="text-[10px] text-neutral-600">
+          Find your ID at discordlookup.com — shows your live status on your page.
+        </p>
+        <Label>Spotify Track ID</Label>
+        <input
+          type="text"
+          value={state.spotify_track_id ?? ""}
+          onChange={(e) => patch({ spotify_track_id: e.target.value || null })}
+          placeholder="e.g. 4cOdK2wGLETKBW3PvgPWqT"
+          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
+        />
+        <p className="text-[10px] text-neutral-600">
+          The 22-character ID from a Spotify track URL (open.spotify.com/track/...).
+        </p>
       </Section>
 
       {/* Music */}

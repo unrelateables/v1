@@ -10,12 +10,14 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: settings } = await supabase
+  // Fetch all columns safely (in case discord columns don't exist yet)
+  const { data: rawSettings } = await supabase
     .from("profile_settings")
-    .select("discord_id, discord_username, discord_display_name, discord_avatar")
+    .select("*")
     .eq("profile_id", user.id)
     .maybeSingle();
 
+  const settings = rawSettings as any;
   const discordConnected = !!(settings?.discord_id && settings?.discord_username);
 
   return (

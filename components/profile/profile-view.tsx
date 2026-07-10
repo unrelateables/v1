@@ -25,6 +25,18 @@ import type {
   CursorEffectType,
 } from "@/lib/types";
 
+function formatAge(iso: string): string {
+  const d = new Date(iso);
+  const now = Date.now();
+  const ms = now - d.getTime();
+  const days = Math.floor(ms / 86400000);
+  if (days < 1) return "today";
+  if (days < 30) return `${days}d`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo`;
+  return `${Math.floor(months / 12)}y`;
+}
+
 const PAGE_ANIM_CLASS: Record<PageEntry, string> = {
   none: "",
   fade: "animate-fade-in",
@@ -137,7 +149,7 @@ export function ProfileView({
               <img
                 src={profile.avatar_url}
                 alt={name}
-                className={`relative h-28 w-28 border-2 object-cover shadow-2xl ${avatarClass}`}
+                className={`relative h-28 w-28 border-2 object-cover shadow-2xl ${avatarClass} ${settings.spin_avatar ? "animate-spin-slow" : ""}`}
                 style={{
                   borderColor: "rgba(0,0,0,0.5)",
                   filter: settings.monochrome_icons ? "grayscale(1)" : undefined,
@@ -145,7 +157,7 @@ export function ProfileView({
               />
             ) : (
               <div
-                className={`relative flex h-28 w-28 items-center justify-center border-2 text-4xl font-bold shadow-2xl ${avatarClass}`}
+                className={`relative flex h-28 w-28 items-center justify-center border-2 text-4xl font-bold shadow-2xl ${avatarClass} ${settings.spin_avatar ? "animate-spin-slow" : ""}`}
                 style={{ borderColor: "rgba(0,0,0,0.5)", background: "rgba(0,0,0,0.5)" }}
               >
                 {name.charAt(0).toUpperCase()}
@@ -168,6 +180,13 @@ export function ProfileView({
           </div>
 
           <p className="mt-1 text-sm font-medium opacity-50">@{profile.username}</p>
+
+          {/* Profile age */}
+          {settings.show_profile_age && profile.created_at && (
+            <p className="mt-0.5 text-[10px] opacity-30">
+              member for {formatAge(profile.created_at)}
+            </p>
+          )}
 
           {/* Bio */}
           {profile.bio && (

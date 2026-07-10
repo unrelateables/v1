@@ -39,6 +39,8 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   monochrome_icons: false,
   custom_font: "none",
   social_links: [],
+  spin_avatar: false,
+  show_profile_age: false,
 };
 
 /** Safe defaults for a profile row (in case columns are missing). */

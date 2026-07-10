@@ -83,6 +83,10 @@ export interface ProfileSettings {
   monochrome_icons: boolean;
   custom_font: CustomFont;
   social_links: SocialLink[];
+  spin_avatar: boolean;
+  show_profile_age: boolean;
+  discord_id: string | null;
+  spotify_track_id: string | null;
   updated_at: string;
 }
 

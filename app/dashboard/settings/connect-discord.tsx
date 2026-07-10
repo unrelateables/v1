@@ -13,10 +13,11 @@ export function ConnectDiscord({
   avatar: string | null;
   discordId: string | null;
 }) {
-  const redirect = encodeURIComponent(
-    `${window.location.origin}/api/discord/callback`
-  );
   const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || "";
+
+  // Redirect to our callback, which will use the Supabase session to know who the user is
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const redirect = encodeURIComponent(`${origin}/api/discord/callback`);
 
   const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirect}&scope=identify`;
 

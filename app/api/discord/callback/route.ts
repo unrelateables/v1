@@ -42,8 +42,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard/settings?discord_error=config", request.url));
   }
 
-  // The redirect URI must EXACTLY match what was used in the authorize URL
-  const redirectUri = `${request.nextUrl.origin}/api/discord/callback`;
+  // Vercel terminates TLS before the function, so request.nextUrl.origin is http://
+  // We must use https:// to match the authorize URL the browser generated
+  const proto = request.headers.get("x-forwarded-proto") || "https";
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || request.nextUrl.host;
+  const redirectUri = `${proto}://${host}/api/discord/callback`;
 
   // Exchange code for tokens
   const tokenRes = await fetch("https://discord.com/api/oauth2/token", {

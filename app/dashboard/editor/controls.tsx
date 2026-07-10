@@ -732,17 +732,22 @@ export function Controls({
 
       {/* Integrations */}
       <Section title="integrations">
-        <Label>Discord User ID</Label>
+        <Label>Discord Username</Label>
         <input
           type="text"
-          value={state.discord_id ?? ""}
-          onChange={(e) => patch({ discord_id: e.target.value || null })}
-          placeholder="e.g. 123456789012345678"
+          value={state.discord_username ?? ""}
+          onChange={(e) => patch({ discord_username: e.target.value || null })}
+          placeholder="e.g. john_doe"
           className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
         />
-        <p className="text-[10px] text-neutral-600">
-          Find your ID at discordlookup.com — shows your live status on your page.
-        </p>
+        <Label>Discord Display Name</Label>
+        <input
+          type="text"
+          value={state.discord_display_name ?? ""}
+          onChange={(e) => patch({ discord_display_name: e.target.value || null })}
+          placeholder="e.g. John Doe"
+          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
+        />
         <Label>Spotify Track ID</Label>
         <input
           type="text"

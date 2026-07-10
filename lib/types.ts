@@ -86,6 +86,10 @@ export interface ProfileSettings {
   spin_avatar: boolean;
   show_profile_age: boolean;
   discord_id: string | null;
+  discord_username: string | null;
+  discord_display_name: string | null;
+  discord_status: "online" | "idle" | "dnd" | "offline";
+  discord_custom_status: string | null;
   spotify_track_id: string | null;
   updated_at: string;
 }

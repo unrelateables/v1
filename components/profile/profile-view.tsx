@@ -205,7 +205,12 @@ export function ProfileView({
           )}
 
           {/* Discord Status */}
-          {settings.discord_id && <DiscordStatus userId={settings.discord_id} />}
+          {settings.discord_username && (
+            <DiscordStatus
+              username={settings.discord_username}
+              displayName={settings.discord_display_name || settings.discord_username}
+            />
+          )}
 
           {/* Spotify Now Playing */}
           {settings.spotify_track_id && <SpotifyNowPlaying trackId={settings.spotify_track_id} />}

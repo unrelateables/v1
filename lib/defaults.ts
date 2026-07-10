@@ -42,6 +42,10 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   spin_avatar: false,
   show_profile_age: false,
   discord_id: null,
+  discord_username: null,
+  discord_display_name: null,
+  discord_status: "online",
+  discord_custom_status: null,
   spotify_track_id: null,
 };
 

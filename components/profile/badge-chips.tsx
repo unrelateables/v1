@@ -32,17 +32,18 @@ function BadgeIcon({
 
   return (
     <div className="group relative">
+      {/* guns.lol style: solid colored rounded-square tile with white icon */}
       <div
-        className="flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 hover:scale-110"
+        className="flex h-[22px] w-[22px] items-center justify-center rounded-[7px] transition-transform duration-150 hover:scale-115"
         style={{
-          background: "rgba(0,0,0,0.4)",
-          border: `1px solid ${rarity.color}66`,
+          background: rarity.color,
+          boxShadow: `0 2px 8px -2px ${rarity.color}88`,
         }}
       >
         <svg
           viewBox="0 0 24 24"
-          className="h-3.5 w-3.5 fill-current"
-          style={{ color: rarity.color }}
+          className="h-3.5 w-3.5"
+          style={{ fill: "#fff" }}
         >
           <path d={def.icon} />
         </svg>

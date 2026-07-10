@@ -46,6 +46,8 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   discord_display_name: null,
   discord_status: "online",
   discord_custom_status: null,
+  discord_avatar: null,
+  discord_global_name: null,
   spotify_track_id: null,
 };
 

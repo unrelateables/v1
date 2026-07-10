@@ -31,6 +31,8 @@ export interface ProfileEffects {
   rain: boolean;
 }
 
+export type DiscordStatusType = "online" | "idle" | "dnd" | "offline";
+
 export interface Profile {
   id: string;
   username: string;
@@ -88,7 +90,9 @@ export interface ProfileSettings {
   discord_id: string | null;
   discord_username: string | null;
   discord_display_name: string | null;
-  discord_status: "online" | "idle" | "dnd" | "offline";
+  discord_avatar: string | null;
+  discord_global_name: string | null;
+  discord_status: DiscordStatusType;
   discord_custom_status: string | null;
   spotify_track_id: string | null;
   updated_at: string;

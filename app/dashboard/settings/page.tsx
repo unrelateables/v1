@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "./settings-form";
+import { ConnectDiscord } from "./connect-discord";
 
 export default async function SettingsPage() {
   const supabase = createClient();
@@ -7,6 +9,14 @@ export default async function SettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
+
+  const { data: settings } = await supabase
+    .from("profile_settings")
+    .select("discord_id, discord_username, discord_display_name, discord_avatar")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+
+  const discordConnected = !!(settings?.discord_id && settings?.discord_username);
 
   return (
     <div className="animate-fade-in">
@@ -16,6 +26,15 @@ export default async function SettingsPage() {
 
       <div className="mt-6 space-y-6">
         <SettingsForm email={user.email || ""} />
+
+        {/* Discord Connection */}
+        <ConnectDiscord
+          connected={discordConnected}
+          username={settings?.discord_username ?? null}
+          displayName={settings?.discord_display_name ?? null}
+          avatar={settings?.discord_avatar ?? null}
+          discordId={settings?.discord_id ?? null}
+        />
 
         {/* Premium (disabled placeholder) */}
         <div className="glass rounded-2xl p-5">

@@ -41,6 +41,8 @@ export const SETTINGS_DEFAULTS: Partial<ProfileSettings> = {
   social_links: [],
   spin_avatar: false,
   show_profile_age: false,
+  discord_id: null,
+  spotify_track_id: null,
 };
 
 /** Safe defaults for a profile row (in case columns are missing). */

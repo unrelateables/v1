@@ -12,6 +12,8 @@ import { BadgeChips } from "./badge-chips";
 import { CursorEffect as CursorEffectLayer } from "./cursor-effect";
 import { UsernameText } from "./username-effects";
 import { SocialIcons } from "./social-icons";
+import { DiscordStatus } from "./discord-status";
+import { SpotifyNowPlaying } from "./spotify-now-playing";
 import {
   FONT_STACKS,
   RADIUS,
@@ -201,6 +203,12 @@ export function ProfileView({
               <SocialIcons links={socialLinks} accent={settings.accent_color} />
             </div>
           )}
+
+          {/* Discord Status */}
+          {settings.discord_id && <DiscordStatus userId={settings.discord_id} />}
+
+          {/* Spotify Now Playing */}
+          {settings.spotify_track_id && <SpotifyNowPlaying trackId={settings.spotify_track_id} />}
 
           {/* Links */}
           <div className={"mt-6 w-full " + (isGrid ? "grid grid-cols-2 gap-2.5" : "space-y-2.5")}>

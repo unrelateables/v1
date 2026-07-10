@@ -64,8 +64,17 @@ export async function GET(request: NextRequest) {
 
   if (!tokenRes.ok) {
     const errText = await tokenRes.text();
-    console.error("Discord token error:", errText);
-    return NextResponse.redirect(new URL(`/dashboard/settings?discord_error=token&msg=${encodeURIComponent(errText.slice(0, 100))}`, request.url));
+    return new NextResponse(
+      `<html><body style="background:#0a0a0f;color:#fff;font-family:monospace;padding:40px;font-size:14px;white-space:pre-wrap">
+<h2>Discord token exchange failed</h2>
+<b>Status:</b> ${tokenRes.status}
+<b>Response:</b> ${errText}
+<b>redirect_uri sent:</b> ${redirectUri}
+<b>client_id:</b> ${clientId?.slice(0, 8)}...
+<b>client_secret set:</b> ${clientSecret ? "yes" : "NO"}
+</body></html>`,
+      { status: 200, headers: { "Content-Type": "text/html" } }
+    );
   }
 
   const tokens = await tokenRes.json();

@@ -731,62 +731,10 @@ export function Controls({
       </Section>
 
       {/* Integrations */}
-      <Section title="discord + spotify" defaultOpen={true}>
-        <Label>Discord Display Name</Label>
-        <input
-          type="text"
-          value={state.discord_display_name ?? ""}
-          onChange={(e) => patch({ discord_display_name: e.target.value || null })}
-          placeholder="e.g. John Doe"
-          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
-        />
-        <Label>Discord Username</Label>
-        <input
-          type="text"
-          value={state.discord_username ?? ""}
-          onChange={(e) => patch({ discord_username: e.target.value || null })}
-          placeholder="e.g. john_doe"
-          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
-        />
-        <PillSelect
-          label="Discord Status"
-          value={state.discord_status ?? "online"}
-          options={[
-            { value: "online", label: "Online" },
-            { value: "idle", label: "Idle" },
-            { value: "dnd", label: "DND" },
-            { value: "offline", label: "Offline" },
-          ]}
-          onChange={(v) => patch({ discord_status: v })}
-        />
-        <Label>Discord Custom Status</Label>
-        <input
-          type="text"
-          value={state.discord_custom_status ?? ""}
-          onChange={(e) => patch({ discord_custom_status: e.target.value || null })}
-          placeholder="e.g. Playing Valorant"
-          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
-        />
-        <Label>Discord Status</Label>
-        <PillSelect
-          label="status"
-          value={state.discord_status ?? "online"}
-          onChange={(v) => patch({ discord_status: v })}
-          options={[
-            { value: "online", label: "Online" },
-            { value: "idle", label: "Idle" },
-            { value: "dnd", label: "DND" },
-            { value: "offline", label: "Offline" },
-          ]}
-        />
-        <Label>Discord Custom Status</Label>
-        <input
-          type="text"
-          value={state.discord_custom_status ?? ""}
-          onChange={(e) => patch({ discord_custom_status: e.target.value || null })}
-          placeholder="e.g. Playing Valorant"
-          className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
-        />
+      <Section title="integrations">
+        <p className="text-[10px] text-neutral-600">
+          Discord connects via Settings page (OAuth). Spotify below:
+        </p>
         <Label>Spotify Track ID</Label>
         <input
           type="text"
@@ -796,7 +744,7 @@ export function Controls({
           className="w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
         />
         <p className="text-[10px] text-neutral-600">
-          Spotify: copy the 22-char ID from open.spotify.com/track/XXX
+          Copy the 22-char ID from open.spotify.com/track/XXX
         </p>
       </Section>
 

@@ -150,6 +150,12 @@ export default async function Landing() {
             <Link href="/leaderboard" className="link-underline">
               leaderboard
             </Link>
+            <Link href="/tos" className="link-underline">
+              terms
+            </Link>
+            <Link href="/privacy" className="link-underline">
+              privacy
+            </Link>
           </div>
         </div>
       </footer>
